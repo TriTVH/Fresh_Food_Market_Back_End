@@ -1,0 +1,20 @@
+services:
+  ocelotapigateway:
+    image: ffm-ocelotapigateway
+    build:
+      context: .
+      dockerfile: OcelotApiGateway/Dockerfile
+
+  accservice.api:
+    image: ffm-accserviceapi
+    build:
+      context: .
+      dockerfile: AccService.API/Dockerfile
+
+
+  productcatalogservice.api:
+    image: ffm-productcatalogserviceapi
+    build:
+      context: .
+      dockerfile: ProductCatalogService.API/Dockerfile
+

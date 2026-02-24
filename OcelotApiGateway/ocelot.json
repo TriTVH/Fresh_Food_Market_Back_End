@@ -1,0 +1,74 @@
+{
+  "Routes": [
+    {
+      "SwaggerKey": "acc-service",
+      "UpstreamPathTemplate": "/auth/{everything}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/auth/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "accservice.api",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "SwaggerKey": "acc-service",
+      "UpstreamPathTemplate": "/account/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/account/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "accservice.api",
+          "Port": 8080
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/supplier/{everything}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/supplier/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 8010
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "acc-service",
+      "Config": [
+        {
+          "Name": "Account Service",
+          "Version": "v1",
+          "Url": "http://accservice.api:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "product-catalog-service",
+      "Config": [
+        {
+          "Name": "Product Catalog Service",
+          "Version": "v1",
+          "Url": "http://productcatalogservice.api:8010/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
+}
