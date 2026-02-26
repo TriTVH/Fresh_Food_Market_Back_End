@@ -1,30 +1,24 @@
 <Solution>
   <Folder Name="/AccService/">
-    <Project Path="D:/FreshFoodMarket/AccService.API/AccService.API.csproj" Id="b3891eda-3d6d-4c11-87ea-c3486b49e2b2" />
-    <Project Path="D:/FreshFoodMarket/AccService.Model/AccService.Model.csproj" Id="9f42e3b5-5e9f-490b-8143-d4478beaba05" />
-    <Project Path="D:/FreshFoodMarket/AccService.Repository/AccService.Repository.csproj" Id="02baba3a-1bf2-4478-8c01-b66cfcfb3cc2" />
-    <Project Path="D:/FreshFoodMarket/AccService.Service/AccService.Service.csproj" Id="f4c0b290-6c7e-4ce6-ae86-bd71efb68e4c" />
+    <Project Path="AccService.API/AccService.API.csproj" />
+    <Project Path="AccService.Model/AccService.Model.csproj" />
+    <Project Path="AccService.Repository/AccService.Repository.csproj" />
+    <Project Path="AccService.Service/AccService.Service.csproj" />
   </Folder>
   <Folder Name="/ApiGateway/">
-    <Project Path="D:/FreshFoodMarket/OcelotApiGateway/OcelotApiGateway.csproj" Id="24a1703a-d9a5-4b0f-9838-b2ed962bf225" />
-  </Folder>
-  <Folder Name="/OrderService/">
-    <Project Path="D:/FreshFoodMarket/OrderService.Model/OrderService.Model.csproj" Id="408c4f5a-c1b4-4b35-abab-be198110b132" />
-    <Project Path="OrderService.API/OrderService.API.csproj" Id="37fa3eb0-de78-4805-bdf4-c4995a715314" />
-    <Project Path="OrderService.Repository/OrderService.Repository.csproj" Id="7b0ca20d-5afb-4a20-94c6-f30428f61b5d" />
-    <Project Path="OrderService.Service/OrderService.Service.csproj" Id="1e4f7b9c-ab44-4cf0-84cd-b1fbe1de75c7" />
+    <Project Path="OcelotApiGateway/OcelotApiGateway.csproj" />
   </Folder>
   <Folder Name="/ProductCatalogService/">
-    <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="e44b227f-1729-442c-8799-a131cae8ebdc" />
+    <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
     <Project Path="ProductCatalogService.Model/ProductCatalogService.Model.csproj" Id="4259e0b5-cebe-4898-9084-87a55815f203" />
     <Project Path="ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
     <Project Path="ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
   </Folder>
   <Folder Name="/SharedProject/">
-    <Project Path="D:/FreshFoodMarket/Contracts/Contracts.csproj" Id="6a7ab824-d4a9-476b-9ebb-a5320c4cbad3" />
-    <Project Path="D:/FreshFoodMarket/JwtConfiguration/JwtConfiguration.csproj" />
+    <Project Path="Contracts/Contracts.csproj" />
+    <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
   </Folder>
-  <Project Path="D:/FreshFoodMarket/docker-compose.dcproj">
+  <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
 </Solution>

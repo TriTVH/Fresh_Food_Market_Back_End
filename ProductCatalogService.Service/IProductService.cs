@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ProductCatalogService.Service.DTO;
+using ProductCatalogService.Service.DTO.Request;
+using ProductCatalogService.Service.DTO.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +11,7 @@ namespace ProductCatalogService.Service
 {
     public interface IProductService
     {
+        Task<ApiResponse<List<ProductDTO>>> GetAllProducts();
+        Task<ApiResponse<ProductDTO>> CreateProduct(CreateProductModel request);
     }
 }

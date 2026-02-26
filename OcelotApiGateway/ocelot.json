@@ -31,14 +31,30 @@
     },
     {
       "SwaggerKey": "product-catalog-service",
-      "UpstreamPathTemplate": "/supplier/{everything}",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamPathTemplate": "/product/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/supplier/{everything}",
+      "DownstreamPathTemplate": "/api/product/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "productcatalogservice.api",
-          "Port": 8010
+          "Port": 7000
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/sub-category/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/sub-category/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 7000
         }
       ],
       "AuthenticationOptions": {
@@ -63,7 +79,7 @@
         {
           "Name": "Product Catalog Service",
           "Version": "v1",
-          "Url": "http://productcatalogservice.api:8010/swagger/v1/swagger.json"
+          "Url": "http://productcatalogservice.api:7000/swagger/v1/swagger.json"
         }
       ]
     }

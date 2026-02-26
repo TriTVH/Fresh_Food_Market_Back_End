@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8010
+EXPOSE 7000
 
 
 # This stage is used to build the service project
@@ -12,10 +12,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ProductCatalogService.API/ProductCatalogService.API.csproj", "ProductCatalogService.API/"]
-COPY ["JwtConfiguration/JwtConfiguration.csproj", "JwtConfiguration/"]
-COPY ["ProductCatalogService.Service/ProductCatalogService.Service.csproj", "ProductCatalogService.Service/"]
-COPY ["ProductCatalogService.Repository/ProductCatalogService.Repository.csproj", "ProductCatalogService.Repository/"]
-COPY ["ProductCatalogService.Model/ProductCatalogService.Model.csproj", "ProductCatalogService.Model/"]
 RUN dotnet restore "./ProductCatalogService.API/ProductCatalogService.API.csproj"
 COPY . .
 WORKDIR "/src/ProductCatalogService.API"

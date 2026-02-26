@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ProductCatalogService.Model;
+namespace InventoryService.Model;
 
 public partial class Supplier
 {
@@ -11,9 +11,11 @@ public partial class Supplier
 
     public string? Address { get; set; }
 
+    public string? Phone { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();
 }

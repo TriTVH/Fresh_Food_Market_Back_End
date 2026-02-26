@@ -1,10 +1,13 @@
+
 using JwtConfiguration;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ProductCatalogService.Model.DBContext;
 using ProductCatalogService.Repository;
 using ProductCatalogService.Repository.Implementor;
 using ProductCatalogService.Service;
+using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.Implementor;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,12 +18,22 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddDbContext<ProductCatalogMgmtFfmContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,                
+                maxRetryDelay: TimeSpan.FromSeconds(10), 
+                errorNumbersToAdd: null         
+            );
+        })
 );
 
-builder.Services.AddScoped<ISupplierRepo, SupplierRepo>();
+builder.Services.AddScoped<IProductRepo, ProductRepo>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ISubCategoryRepo, SubCategoryRepo>();
+builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();
 
 builder.Services.AddJwtAuthentication();
 
@@ -58,9 +71,8 @@ builder.Services.AddSwaggerGen(c =>
         new List<string>()
     }
 });
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Product Catalog API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Product API", Version = "v1" });
 });
-
 
 var app = builder.Build();
 
@@ -70,7 +82,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product Catalog API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
     });
 }
 
@@ -80,4 +92,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

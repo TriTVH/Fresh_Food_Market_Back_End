@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace ProductCatalogService.Repository
 {
-    public interface ISupplierRepo
+    public interface ISubCategoryRepo
     {
-        Task<Supplier> CreateSupplierAsync(Supplier supplier);
+        Task<List<SubCategory>> GetSubCategories();
+        Task<SubCategory> GetSubCategoryById(int subCategoryId);
     }
 }

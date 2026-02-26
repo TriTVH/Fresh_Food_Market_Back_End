@@ -1,5 +1,4 @@
 ﻿using ProductCatalogService.Service.DTO;
-using ProductCatalogService.Service.DTO.Request;
 using ProductCatalogService.Service.DTO.Response;
 using System;
 using System.Collections.Generic;
@@ -9,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace ProductCatalogService.Service
 {
-    public interface ISupplierService
+    public interface ISubCategoryService
     {
-        Task<ApiResponse<SupplierDTO>> CreateSupplierAsync(SupplierModel request);
+        public Task<ApiResponse<List<SubCategoryDTO>>> GetSubCategories();
     }
 }

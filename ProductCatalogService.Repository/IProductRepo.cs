@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProductCatalogService.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace ProductCatalogService.Repository
 {
     public interface IProductRepo
     {
+        Task<List<Product>> GetAllProducts();
+        Task<Product> CreateAsync(Product product);
     }
 }
