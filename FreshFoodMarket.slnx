@@ -8,6 +8,12 @@
   <Folder Name="/ApiGateway/">
     <Project Path="OcelotApiGateway/OcelotApiGateway.csproj" />
   </Folder>
+  <Folder Name="/InventoryService/">
+    <Project Path="InventoryService.API/InventoryService.API.csproj" Id="f1707882-2522-4c13-9057-63c99d072240" />
+    <Project Path="InventoryService.Model/InventoryService.Model.csproj" Id="cfbad737-7f1c-4b43-849d-6fbd7020721d" />
+    <Project Path="InventoryService.Repository/InventoryService.Repository.csproj" Id="b1c08921-fa5c-4b98-9596-4c332d7433aa" />
+    <Project Path="InventoryService.Service/InventoryService.Service.csproj" Id="5f2ee532-8c68-47c2-a339-1c402bb829e1" />
+  </Folder>
   <Folder Name="/ProductCatalogService/">
     <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
     <Project Path="ProductCatalogService.Model/ProductCatalogService.Model.csproj" Id="4259e0b5-cebe-4898-9084-87a55815f203" />
