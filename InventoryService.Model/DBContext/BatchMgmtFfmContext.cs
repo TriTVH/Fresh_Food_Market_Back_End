@@ -72,6 +72,9 @@ public partial class BatchMgmtFfmContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.ExpiredDate).HasColumnName("expired_date");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ProductName).HasColumnName("product_name")
+            .HasMaxLength(254)
+            .IsUnicode(true);
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Subtotal)
                 .HasColumnType("decimal(15, 2)")

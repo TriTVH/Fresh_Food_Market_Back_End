@@ -1,4 +1,5 @@
-﻿using ProductCatalogService.Service.DTO;
+﻿using ProductCatalogService.Model;
+using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.DTO.Request;
 using ProductCatalogService.Service.DTO.Response;
 using System;
@@ -13,5 +14,8 @@ namespace ProductCatalogService.Service
     {
         Task<ApiResponse<List<ProductDTO>>> GetAllProducts();
         Task<ApiResponse<ProductDTO>> CreateProduct(CreateProductModel request);
+        Task<ApiResponse<List<ProductDTO>>> GetProductsByIds(List<int> productIds);
+        Task<ApiResponse<ProductDTO>> GetProductByIdAsync(int productId);
+        Task<ApiResponse<List<ProductDTO>>> GetProductsByIdsAsync(List<int> productIds);
     }
 }

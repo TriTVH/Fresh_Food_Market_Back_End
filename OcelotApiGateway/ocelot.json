@@ -15,10 +15,10 @@
     },
     {
       "SwaggerKey": "acc-service",
-      "UpstreamPathTemplate": "/account/{everything}",
+      "UpstreamPathTemplate": "/account",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/account/{everything}",
+      "DownstreamPathTemplate": "/api/account",
       "DownstreamHostAndPorts": [
         {
           "Host": "accservice.api",
@@ -27,30 +27,35 @@
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
+      },
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "AccCache"
       }
     },
     {
       "SwaggerKey": "product-catalog-service",
-      "UpstreamPathTemplate": "/product/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/product/{everything}",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "productcatalogservice.api",
-          "Port": 7000
-        }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "SwaggerKey": "product-catalog-service",
-      "UpstreamPathTemplate": "/sub-category/{everything}",
+      "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/sub-category/{everything}",
+      "DownstreamPathTemplate": "/api/product",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 7000
+        }
+      ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "ProductCache"
+      }
+    },
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/product",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/product",
       "DownstreamHostAndPorts": [
         {
           "Host": "productcatalogservice.api",
@@ -60,9 +65,116 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/sub-category",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/sub-category",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 7000
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "SubCateCache"
+      }
+    },
+    {
+      "SwaggerKey": "blog-service",
+      "UpstreamPathTemplate": "/news",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/news",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "blogservice.api",
+          "Port": 7200
+        }
+      ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "BlogCache"
+      }
+    },
+    {
+      "SwaggerKey": "inventory-service",
+      "UpstreamPathTemplate": "/supplier",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/supplier",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice.api",
+          "Port": 7300
+        }
+      ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "SupplierCache"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "inventory-service",
+      "UpstreamPathTemplate": "/batch",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/batch",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice.api",
+          "Port": 7300
+        }
+      ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "BatchCache"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "inventory-service",
+      "UpstreamPathTemplate": "/batch",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/batch",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice.api",
+          "Port": 7300
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "saga-orchestator",
+      "UpstreamPathTemplate": "/saga/{everything}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/saga/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "saga.orchestrator",
+          "Port": 7500
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [
+
     {
       "Key": "acc-service",
       "Config": [
@@ -80,6 +192,36 @@
           "Name": "Product Catalog Service",
           "Version": "v1",
           "Url": "http://productcatalogservice.api:7000/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "blog-service",
+      "Config": [
+        {
+          "Name": "Blog Service",
+          "Version": "v1",
+          "Url": "http://blogservice.api:7200/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "inventory-service",
+      "Config": [
+        {
+          "Name": "Inventory Service",
+          "Version": "v1",
+          "Url": "http://inventoryservice.api:7300/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "saga-orchestator",
+      "Config": [
+        {
+          "Name": "Saga Orchestator",
+          "Version": "v1",
+          "Url": "http://saga.orchestrator:7500/swagger/v1/swagger.json"
         }
       ]
     }

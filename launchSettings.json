@@ -7,7 +7,10 @@
         "ocelotapigateway": "StartDebugging",
         "authservice.api": "StartDebugging",
         "accservice.api": "StartDebugging",
-        "productcatalogservice.api": "StartDebugging"
+        "productcatalogservice.api": "StartDebugging",
+        "blogservice.api": "StartDebugging",
+        "inventoryservice.api": "StartDebugging",
+        "saga.orchestrator": "StartDebugging"
       }
     }
   }

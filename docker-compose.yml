@@ -17,21 +17,25 @@ services:
     build:
       context: .
       dockerfile: ProductCatalogService.API/Dockerfile
+  blogservice.api:
+    image: ffm-blogserviceapi
+    build:
+      context: .
+      dockerfile: BlogService.API/Dockerfile
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    hostname: rabbitmq
-    ports:
-      - "5672:5672"     # App connect
-      - "15672:15672"   # Web UI
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - ffm-network
-    restart: always
+  inventoryservice.api:
+    image: ffm-inventoryserviceapi
+    build:
+      context: .
+      dockerfile: InventoryService.API/Dockerfile
+
+  saga.orchestrator:
+    image: ffm-sagaorchestrator
+    build:
+      context: .
+      dockerfile: SagaOrchestrator/Dockerfile
+
 volumes:
    rabbitmq_data:
+
+

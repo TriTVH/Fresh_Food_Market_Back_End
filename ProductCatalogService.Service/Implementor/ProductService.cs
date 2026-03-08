@@ -1,4 +1,6 @@
-﻿using ProductCatalogService.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductCatalogService.Model;
+using ProductCatalogService.Model.DBContext;
 using ProductCatalogService.Repository;
 using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.DTO.Request;
@@ -15,7 +17,7 @@ namespace ProductCatalogService.Service.Implementor
     {
         IProductRepo _productRepo;
         ISubCategoryRepo _subCategoryRepo;
-        public ProductService(IProductRepo productRepo, ISubCategoryRepo subCategoryRepo)
+        public ProductService( IProductRepo productRepo, ISubCategoryRepo subCategoryRepo)
         {
             _productRepo = productRepo;
             _subCategoryRepo = subCategoryRepo;
@@ -107,6 +109,97 @@ namespace ProductCatalogService.Service.Implementor
             {
                 return ApiResponse<List<ProductDTO>>.Error(null, ex.Message, 500);
             }
+        }
+
+        public async Task<ApiResponse<ProductDTO>> GetProductByIdAsync(int productId)
+        {
+            try
+            {
+                var product = await _productRepo.GetProductByIdAsync(productId);
+                if (product == null)
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "Product not found", 404);
+                }
+                var productDTO = new ProductDTO()
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    SubCategoryName = product.SubCategory.SubCategoryName,
+                    CategoryName = product.SubCategory.Category.CategoryName,
+                    Description = product.Description,
+                    PriceSell = product.PriceSell,
+                    Quantity = product.Quantity,
+                    Weight = product.Weight,
+                    Unit = product.Unit,
+                    IsOrganic = product.IsOrganic,
+                    Certification = product.Certification,
+                    IsAvailable = product.IsAvailable,
+                    ImagesJson = product.ImagesJson,
+                    RatingCount = product.RatingCount,
+                    RatingAverage = product.RatingAverage,
+                    SoldCount = product.SoldCount,
+                    CreatedAt = product.CreatedAt,
+                    UpdatedAt = product.UpdatedAt
+                };
+                return ApiResponse<ProductDTO>.Ok(productDTO);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
+            }
+        }
+
+        public async Task<ApiResponse<List<ProductDTO>>> GetProductsByIds(List<int> productIds)
+        {
+            var products = await _productRepo.GetProductsByIdsAsync(productIds);
+            var productDTOs = products.Select(p => new ProductDTO()
+            {
+                ProductId = p.ProductId,
+                ProductName = p.ProductName,
+                SubCategoryName = p.SubCategory.SubCategoryName,
+                CategoryName = p.SubCategory.Category.CategoryName,
+                Description = p.Description,
+                PriceSell = p.PriceSell,
+                Quantity = p.Quantity,
+                Weight = p.Weight,
+                Unit = p.Unit,
+                IsOrganic = p.IsOrganic,
+                Certification = p.Certification,
+                IsAvailable = p.IsAvailable,
+                ImagesJson = p.ImagesJson,
+                RatingCount = p.RatingCount,
+                RatingAverage = p.RatingAverage,
+                SoldCount = p.SoldCount,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            }).ToList();
+        }
+
+        public async Task<ApiResponse<List<ProductDTO>>> GetProductsByIdsAsync(List<int> productIds)
+        {
+            var products = await _productRepo.GetProductsByIdsAsync(productIds);
+            var productDTOs = products.Select(p => new ProductDTO()
+            {
+                ProductId = p.ProductId,
+                ProductName = p.ProductName,
+                SubCategoryName = p.SubCategory.SubCategoryName,
+                CategoryName = p.SubCategory.Category.CategoryName,
+                Description = p.Description,
+                PriceSell = p.PriceSell,
+                Quantity = p.Quantity,
+                Weight = p.Weight,
+                Unit = p.Unit,
+                IsOrganic = p.IsOrganic,
+                Certification = p.Certification,
+                IsAvailable = p.IsAvailable,
+                ImagesJson = p.ImagesJson,
+                RatingCount = p.RatingCount,
+                RatingAverage = p.RatingAverage,
+                SoldCount = p.SoldCount,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            }).ToList();
+            return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
         }
     }
 }

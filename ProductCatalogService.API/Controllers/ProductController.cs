@@ -47,5 +47,18 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+            [HttpPost("by-ids")]
+            public async Task<IActionResult> GetProductsByIds([FromBody] List<int> productIds)
+            {
+                var response = await _productService.GetProductsByIds(productIds);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return StatusCode(response.StatusCode, response);
+                }
+            }
     }
 }

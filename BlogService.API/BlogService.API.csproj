@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>e4b1384a-2329-4e3b-a8f9-8d51b635d272</UserSecretsId>
+    <UserSecretsId>36915a70-c808-4831-81a3-c73d0c146a5b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InventoryService.Service\InventoryService.Service.csproj" />
+    <ProjectReference Include="..\BlogService.Service\BlogService.Service.csproj" />
     <ProjectReference Include="..\JwtConfiguration\JwtConfiguration.csproj" />
   </ItemGroup>
 

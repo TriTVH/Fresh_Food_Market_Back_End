@@ -8,6 +8,12 @@
   <Folder Name="/ApiGateway/">
     <Project Path="OcelotApiGateway/OcelotApiGateway.csproj" />
   </Folder>
+  <Folder Name="/BlogService/">
+    <Project Path="BlogService.API/BlogService.API.csproj" Id="9f9d5c75-854f-4184-85f4-edc1ca32f56d" />
+    <Project Path="BlogService.Model/BlogService.Model.csproj" Id="05c78ed2-e825-4377-8dc4-ef90e8c8c2d5" />
+    <Project Path="BlogService.Repository/BlogService.Repository.csproj" Id="f67bcb7c-cdac-42dc-b5e9-e28838c0e959" />
+    <Project Path="BlogService.Service/BlogService.Service.csproj" Id="05f24201-aa0f-4c90-81c2-49face003eca" />
+  </Folder>
   <Folder Name="/InventoryService/">
     <Project Path="InventoryService.API/InventoryService.API.csproj" Id="f1707882-2522-4c13-9057-63c99d072240" />
     <Project Path="InventoryService.Model/InventoryService.Model.csproj" Id="cfbad737-7f1c-4b43-849d-6fbd7020721d" />
@@ -20,8 +26,10 @@
     <Project Path="ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
     <Project Path="ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
   </Folder>
+  <Folder Name="/Saga.Orchestator/">
+    <Project Path="SagaOrchestrator/Saga.Orchestrator.csproj" Id="e2f64d64-5121-44e9-80ee-88e6d305f0a2" />
+  </Folder>
   <Folder Name="/SharedProject/">
-    <Project Path="Contracts/Contracts.csproj" />
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
   </Folder>
   <Project Path="docker-compose.dcproj">

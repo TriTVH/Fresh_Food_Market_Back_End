@@ -1,8 +1,8 @@
-using InventoryService.Model.DBContext;
-using InventoryService.Repository;
-using InventoryService.Repository.Implementors;
-using InventoryService.Service;
-using InventoryService.Service.Implementors;
+using BlogService.Model.DBContext;
+using BlogService.Repository;
+using BlogService.Repository.Implementor;
+using BlogService.Service;
+using BlogService.Service.Implementor;
 using JwtConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -14,7 +14,7 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddDbContext<BatchMgmtFfmContext>(options =>
+builder.Services.AddDbContext<ContentMgmtFfmContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions =>
         {
@@ -26,17 +26,8 @@ builder.Services.AddDbContext<BatchMgmtFfmContext>(options =>
         })
 );
 
-
-
-//builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-//builder.Services.AddScoped<IAccountService, AccountService>();
-//builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
-builder.Services.AddScoped<ISupplierRepo, SupplierRepo>();
-builder.Services.AddScoped<IBatchRepo, BatchRepo>();
-
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IBatchService, BatchService>();
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<INewsService, NewsService>();
 
 builder.Services.AddJwtAuthentication();
 
@@ -74,7 +65,7 @@ builder.Services.AddSwaggerGen(c =>
         new List<string>()
     }
 });
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Inventory API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Blog API", Version = "v1" });
 });
 
 
@@ -86,7 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Inventory API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog API V1");
     });
 }
 
