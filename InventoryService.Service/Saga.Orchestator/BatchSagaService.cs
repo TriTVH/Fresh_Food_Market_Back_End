@@ -8,6 +8,7 @@ namespace InventoryService.Service.Saga.Orchestator
 {
     public class BatchSagaService
     {
-
+        //private readonly  ;
+        //private readonly  ;
     }
 }

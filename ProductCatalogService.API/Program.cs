@@ -9,6 +9,7 @@ using ProductCatalogService.Repository.Implementor;
 using ProductCatalogService.Service;
 using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.Implementor;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,10 @@ builder.Services.AddDbContext<ProductCatalogMgmtFfmContext>(options =>
                 errorNumbersToAdd: null         
             );
         })
+);
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect("redis:6379")
 );
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();

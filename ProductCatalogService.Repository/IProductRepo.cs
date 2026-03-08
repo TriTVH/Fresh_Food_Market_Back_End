@@ -14,8 +14,5 @@ namespace ProductCatalogService.Repository
         Task<Product> UpdateAsync(Product product);
         Task<int> SaveChangeAsync(Product product);
         Task<Product> GetProductByIdAsync(int id);
-
-
-
     }
 }

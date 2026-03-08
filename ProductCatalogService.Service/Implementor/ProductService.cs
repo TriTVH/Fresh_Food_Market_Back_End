@@ -5,6 +5,7 @@ using ProductCatalogService.Repository;
 using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.DTO.Request;
 using ProductCatalogService.Service.DTO.Response;
+using ProductCatalogService.Service.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace ProductCatalogService.Service.Implementor
     {
         IProductRepo _productRepo;
         ISubCategoryRepo _subCategoryRepo;
-        public ProductService( IProductRepo productRepo, ISubCategoryRepo subCategoryRepo)
+        IProductRedisCacheService _productRedisCacheService;
+
+        public ProductService(IProductRedisCacheService productRedisCacheService, IProductRepo productRepo, ISubCategoryRepo subCategoryRepo)
         {
             _productRepo = productRepo;
             _subCategoryRepo = subCategoryRepo;
+            _productRedisCacheService = productRedisCacheService;
         }
 
         public async Task<ApiResponse<ProductDTO>> CreateProduct(CreateProductModel request)
@@ -81,6 +85,13 @@ namespace ProductCatalogService.Service.Implementor
         {
             try
             {
+                var productsFromRedis = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+
+                if (productsFromRedis.Any())
+                {
+                    return ApiResponse<List<ProductDTO>>.Ok(productsFromRedis);
+                }
+
                 var products = await _productRepo.GetAllProducts();
                 var productDTOs = products.Select(p => new ProductDTO()
                 {
@@ -103,6 +114,7 @@ namespace ProductCatalogService.Service.Implementor
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt
                 }).ToList();
+                await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
                 return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
             }
             catch (Exception ex)
@@ -149,57 +161,6 @@ namespace ProductCatalogService.Service.Implementor
             }
         }
 
-        public async Task<ApiResponse<List<ProductDTO>>> GetProductsByIds(List<int> productIds)
-        {
-            var products = await _productRepo.GetProductsByIdsAsync(productIds);
-            var productDTOs = products.Select(p => new ProductDTO()
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                SubCategoryName = p.SubCategory.SubCategoryName,
-                CategoryName = p.SubCategory.Category.CategoryName,
-                Description = p.Description,
-                PriceSell = p.PriceSell,
-                Quantity = p.Quantity,
-                Weight = p.Weight,
-                Unit = p.Unit,
-                IsOrganic = p.IsOrganic,
-                Certification = p.Certification,
-                IsAvailable = p.IsAvailable,
-                ImagesJson = p.ImagesJson,
-                RatingCount = p.RatingCount,
-                RatingAverage = p.RatingAverage,
-                SoldCount = p.SoldCount,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToList();
-        }
 
-        public async Task<ApiResponse<List<ProductDTO>>> GetProductsByIdsAsync(List<int> productIds)
-        {
-            var products = await _productRepo.GetProductsByIdsAsync(productIds);
-            var productDTOs = products.Select(p => new ProductDTO()
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                SubCategoryName = p.SubCategory.SubCategoryName,
-                CategoryName = p.SubCategory.Category.CategoryName,
-                Description = p.Description,
-                PriceSell = p.PriceSell,
-                Quantity = p.Quantity,
-                Weight = p.Weight,
-                Unit = p.Unit,
-                IsOrganic = p.IsOrganic,
-                Certification = p.Certification,
-                IsAvailable = p.IsAvailable,
-                ImagesJson = p.ImagesJson,
-                RatingCount = p.RatingCount,
-                RatingAverage = p.RatingAverage,
-                SoldCount = p.SoldCount,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToList();
-            return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
-        }
     }
 }

@@ -40,7 +40,7 @@ namespace InventoryService.Service.Implementors
                     BatchDetails = request.Items.Select(i => new BatchDetail
                     {
                         ProductId = i.ProductId,
-                        ProductName = i.ProductName,
+                        //ProductName = i.ProductName,
                         Quantity = i.Quantity
                     }).ToList()
                 };

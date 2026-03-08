@@ -26,9 +26,7 @@
     <Project Path="ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
     <Project Path="ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
   </Folder>
-  <Folder Name="/Saga.Orchestator/">
-    <Project Path="SagaOrchestrator/Saga.Orchestrator.csproj" Id="e2f64d64-5121-44e9-80ee-88e6d305f0a2" />
-  </Folder>
+  <Folder Name="/Saga.Orchestator/" />
   <Folder Name="/SharedProject/">
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
   </Folder>
