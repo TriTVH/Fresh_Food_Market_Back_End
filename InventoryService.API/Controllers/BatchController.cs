@@ -8,6 +8,7 @@ namespace InventoryService.API.Controllers
     public class BatchController : ControllerBase
     {
         IBatchService _service;
+       
         public BatchController(IBatchService service)
         {
             _service = service;
@@ -26,17 +27,29 @@ namespace InventoryService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult> GetById([FromRoute] int id)
+        {
+            var response = await _service.GetBatchByIdAsync(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateBatchModel request)
         {
             var response = await _service.AddBatchAsync(request);
-            if (response.Success)
-            {
-                return Ok(response);
-            } else
-            {
+
                 return StatusCode(response.StatusCode, response);
-            }
+            
         }
 
     }

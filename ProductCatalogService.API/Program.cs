@@ -9,6 +9,8 @@ using ProductCatalogService.Repository.Implementor;
 using ProductCatalogService.Service;
 using ProductCatalogService.Service.DTO;
 using ProductCatalogService.Service.Implementor;
+using ProductCatalogService.Service.Redis;
+using ProductCatalogService.Service.Redis.Implementor;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +35,8 @@ builder.Services.AddDbContext<ProductCatalogMgmtFfmContext>(options =>
 builder.Services.AddSingleton<IConnectionMultiplexer>(
     ConnectionMultiplexer.Connect("redis:6379")
 );
+
+builder.Services.AddScoped<IProductRedisCacheService, ProductRedisCacheService>();
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<IProductService, ProductService>();

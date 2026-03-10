@@ -8,7 +8,11 @@ namespace InventoryService.Service.Saga.Orchestator
 {
     public class BatchSagaService
     {
-        //private readonly  ;
-        //private readonly  ;
+        private readonly IHttpClientFactory _httpClientFactory;
+        public BatchSagaService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
     }
 }

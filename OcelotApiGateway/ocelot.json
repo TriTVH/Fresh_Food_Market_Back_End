@@ -35,10 +35,10 @@
     },
     {
       "SwaggerKey": "product-catalog-service",
-      "UpstreamPathTemplate": "/product",
+      "UpstreamPathTemplate": "/product/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/product",
+      "DownstreamPathTemplate": "/api/product/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "productcatalogservice.api",
@@ -68,10 +68,10 @@
     },
     {
       "SwaggerKey": "product-catalog-service",
-      "UpstreamPathTemplate": "/sub-category",
+      "UpstreamPathTemplate": "/sub-category/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/sub-category",
+      "DownstreamPathTemplate": "/api/sub-category/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "productcatalogservice.api",
@@ -88,10 +88,10 @@
     },
     {
       "SwaggerKey": "blog-service",
-      "UpstreamPathTemplate": "/news",
+      "UpstreamPathTemplate": "/news/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/news",
+      "DownstreamPathTemplate": "/api/news/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "blogservice.api",
@@ -105,10 +105,10 @@
     },
     {
       "SwaggerKey": "inventory-service",
-      "UpstreamPathTemplate": "/supplier",
+      "UpstreamPathTemplate": "/supplier/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/supplier",
+      "DownstreamPathTemplate": "/api/supplier/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "inventoryservice.api",
@@ -125,10 +125,10 @@
     },
     {
       "SwaggerKey": "inventory-service",
-      "UpstreamPathTemplate": "/batch",
+      "UpstreamPathTemplate": "/batch/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/batch",
+      "DownstreamPathTemplate": "/api/batch/{everything}",
       "DownstreamHostAndPorts": [
         {
           "Host": "inventoryservice.api",
@@ -158,19 +158,6 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
-    },
-    {
-      "SwaggerKey": "saga-orchestator",
-      "UpstreamPathTemplate": "/saga/{everything}",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/saga/{everything}",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "saga.orchestrator",
-          "Port": 7500
-        }
-      ]
     }
   ],
   "SwaggerEndPoints": [
@@ -212,16 +199,6 @@
           "Name": "Inventory Service",
           "Version": "v1",
           "Url": "http://inventoryservice.api:7300/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "saga-orchestator",
-      "Config": [
-        {
-          "Name": "Saga Orchestator",
-          "Version": "v1",
-          "Url": "http://saga.orchestrator:7500/swagger/v1/swagger.json"
         }
       ]
     }

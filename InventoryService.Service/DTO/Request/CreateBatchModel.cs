@@ -19,8 +19,5 @@ namespace InventoryService.Service.DTO.Request
 
         public int Quantity { get; set; }
 
-        public DateOnly? ExpiredDate { get; set; }
-
-        public DateTime? CreatedAt { get; set; }
     }
 }

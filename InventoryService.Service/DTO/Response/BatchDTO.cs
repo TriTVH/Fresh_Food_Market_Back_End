@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InventoryService.Service.DTO.Request;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace InventoryService.Service.DTO.Response
 
         public string SupplierAddress { get; set; }
 
-        public string CreatedBy { get; set; } = null!;
+        public string? SupplyBy { get; set; } = null!;
 
         public string BatchCode { get; set; } = null!;
 
@@ -30,7 +31,7 @@ namespace InventoryService.Service.DTO.Response
 
         public string? ImageConfirmReceived { get; set; }
 
-        public string? Notes { get; set; }
+        public BatchNoteModel? Notes { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 
@@ -43,6 +44,7 @@ namespace InventoryService.Service.DTO.Response
         public int BatchDetailId { get; set; }
 
         public int ProductId { get; set; }
+        public string ProductName { get; set; }
 
         public int Quantity { get; set; }
 

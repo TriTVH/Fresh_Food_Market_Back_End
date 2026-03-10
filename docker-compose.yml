@@ -29,11 +29,6 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
-  saga.orchestrator:
-    image: ffm-sagaorchestrator
-    build:
-      context: .
-      dockerfile: SagaOrchestrator/Dockerfile
 
 volumes:
    rabbitmq_data:
