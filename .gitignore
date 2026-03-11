@@ -65,8 +65,6 @@ PublishProfiles/
 *.pubxml.user
 
 # Docker related
-**/docker-compose.override.yml
-**/docker-compose.override.*.yml
 **/docker-compose.debug.yml
 **/docker-compose.debug.*.yml
 

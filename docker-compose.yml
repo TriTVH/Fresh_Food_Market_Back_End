@@ -29,10 +29,6 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5e297cb5cf5e183d600a4d1e61894fbe74e6a783
 volumes:
    rabbitmq_data:
 
