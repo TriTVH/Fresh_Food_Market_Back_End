@@ -69,7 +69,6 @@ public partial class BatchMgmtFfmContext : DbContext
 
             entity.Property(e => e.BatchDetailId).HasColumnName("batch_detail_id");
             entity.Property(e => e.BatchId).HasColumnName("batch_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.ExpiredDate).HasColumnName("expired_date");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductName).HasColumnName("product_name")

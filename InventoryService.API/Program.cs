@@ -34,6 +34,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 );
 
 builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<ISupplierRepo, SupplierRepo>();
 builder.Services.AddScoped<IBatchRepo, BatchRepo>();

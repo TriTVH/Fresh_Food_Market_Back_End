@@ -19,7 +19,5 @@ public partial class BatchDetail
 
     public DateOnly? ExpiredDate { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
-
     public virtual Batch Batch { get; set; } = null!;
 }

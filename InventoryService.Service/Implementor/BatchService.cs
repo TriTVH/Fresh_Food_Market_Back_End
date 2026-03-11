@@ -154,7 +154,8 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     ProductId = d.ProductId,
                     ProductName = d.ProductName,
                     Quantity = d.Quantity,
-                    Subtotal = d.Subtotal,
+                    Price = d.Subtotal,
+                    ExpiredDate = d.ExpiredDate
                 }).ToList()
             };
             return ApiResponse<BatchDTO>.Ok(batchDTO, "Batch retrieved successfully", 200);
@@ -180,7 +181,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
             return JsonSerializer.Deserialize<ProductDTO>(value!);
         }
 
-        public async Task<ApiResponse<BatchDTO>> UpdateBatchAsync(UpdateBatchModel request )
+        public async Task<ApiResponse<BatchDTO>> UpdateBatchAsync(UpdateBatchModel request, string username, string role )
         {
             var batch = await _repo.GetBatchByIdAsync(request.Id);
             if (batch == null)
@@ -188,6 +189,16 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                 return ApiResponse<BatchDTO>.Error(null, "Batch not found", 404);
             }
             var note = new BatchNoteModel();
+
+            if (!HasPermission(request.Action, role))
+            {
+                return ApiResponse<BatchDTO>.Error(
+                    null,
+                    $"Forbidden: You are not allowed to perform action '{request.Action}'",
+                    403
+                );
+            }
+
             switch (request.Action)
             {
                 case BatchAction.Confirm:
@@ -207,14 +218,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                             400
                         );
                     }
-                    if (!batch.BatchDetails.Any())
-                    {
-                        return ApiResponse<BatchDTO>.Error(
-                            null,
-                            "Cannot confirm batch because batch has no details.",
-                            400
-                        );
-                    }
+
                     note = DeserializeBatchNote(batch.Notes);
 
                     var insufficientSupplyNote = new List<MissingSupplyNote>();
@@ -242,7 +246,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                         {
                             return ApiResponse<BatchDTO>.Error(
                                 null,
-                                $"Quantity cannot be negative for BatchDetailId {item.BatchDetailId}.",
+                                $"Quantity cannot be negative for BatchDetailId {item.Id}.",
                                 400
                             );
                         }
@@ -251,7 +255,6 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
 
                         if (providedQuantity < requiredQuantity)
                         {
-
                             if (providedQuantity == 0)
                             {
                                 unprovidedProducts.Add(new MissingSupplyNote
@@ -280,10 +283,13 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                         }
                         detail.Quantity = providedQuantity;
                         detail.ExpiredDate = item.ExpiredDate;
+                        detail.Subtotal = item.Price;
                     }
 
-                    note.InsufficientSupplyNote = MergeMissingSupplies(note.InsufficientSupplyNote, insufficientSupplyNote);
-                    note.UndeliverableSupplies = MergeMissingSupplies(note.UndeliverableSupplies, unprovidedProducts);
+                    note.InsufficientSupplyNote = insufficientSupplyNote;
+                    note.UndeliverableSupplies = unprovidedProducts;
+
+                    batch.CreatedBy = username;
 
                     batch.Notes = SerializeBatchNote(note);
                     batch.Status = "PACKAGING";
@@ -317,6 +323,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     return ApiResponse<BatchDTO>.Error(null, "Invalid action", 400);
             }
             var updated = await _repo.UpdateBatchAsync(batch);
+
             return ApiResponse<BatchDTO>.Ok(null);
         }
         private BatchNoteModel DeserializeBatchNote(string? noteJson)
@@ -343,38 +350,19 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                 WriteIndented = true
             });
         }
-
-        private List<MissingSupplyNote> MergeMissingSupplies(
-    List<MissingSupplyNote>? existing,
-    List<MissingSupplyNote>? incoming)
+        private bool HasPermission(BatchAction action, string? role)
         {
-            var result = existing?.ToList() ?? new List<MissingSupplyNote>();
+            if (string.IsNullOrWhiteSpace(role))
+                return false;
 
-            if (incoming == null || !incoming.Any())
+            return action switch
             {
-                return result;
-            }
-
-            foreach (var item in incoming)
-            {
-                var old = result.FirstOrDefault(x => x.BatchDetailId == item.BatchDetailId);
-
-                if (old == null)
-                {
-                    result.Add(item);
-                }
-                else
-                {
-                    old.ProductId = item.ProductId;
-                    old.ProductName = item.ProductName;
-                    old.Required = item.Required;
-                    old.Provided = item.Provided;
-                    old.Missing = item.Missing;
-                }
-            }
-
-            return result;
+                BatchAction.Confirm => role is "3",
+                BatchAction.Delivery => role is "3",
+                BatchAction.Complete => role is "1",
+                BatchAction.Cancel => role is "1",
+                _ => false
+            };
         }
-
     }
 }

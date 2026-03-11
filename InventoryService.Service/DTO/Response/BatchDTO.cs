@@ -48,10 +48,8 @@ namespace InventoryService.Service.DTO.Response
 
         public int Quantity { get; set; }
 
-        public decimal Subtotal { get; set; }
+        public decimal Price { get; set; }
 
         public DateOnly? ExpiredDate { get; set; }
-
-        public DateTime? CreatedAt { get; set; }
     }
 }

@@ -146,7 +146,7 @@
     {
       "SwaggerKey": "inventory-service",
       "UpstreamPathTemplate": "/batch",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": [ "POST", "PUT" ],
       "DownstreamScheme": "http",
       "DownstreamPathTemplate": "/api/batch",
       "DownstreamHostAndPorts": [
