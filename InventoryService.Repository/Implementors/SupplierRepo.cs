@@ -1,5 +1,6 @@
 ﻿using InventoryService.Model;
 using InventoryService.Model.DBContext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,10 @@ namespace InventoryService.Repository.Implementors
         public async Task<List<Supplier>> GetSuppliers()
         {
             return _context.Suppliers.ToList();
+        }
+        public async Task<Supplier> GetSupplierById(int supplierId)
+        {
+            return await _context.Suppliers.FirstOrDefaultAsync(s => s.SupplierId == supplierId);
         }
     }
 }

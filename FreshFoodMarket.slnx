@@ -1,35 +1,35 @@
 <Solution>
   <Folder Name="/AccService/">
-    <Project Path="AccService.API/AccService.API.csproj" />
-    <Project Path="AccService.Model/AccService.Model.csproj" />
-    <Project Path="AccService.Repository/AccService.Repository.csproj" />
-    <Project Path="AccService.Service/AccService.Service.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/AccService.API/AccService.API.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/AccService.Model/AccService.Model.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/AccService.Repository/AccService.Repository.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/AccService.Service/AccService.Service.csproj" />
   </Folder>
   <Folder Name="/ApiGateway/">
-    <Project Path="OcelotApiGateway/OcelotApiGateway.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/OcelotApiGateway/OcelotApiGateway.csproj" />
   </Folder>
   <Folder Name="/BlogService/">
-    <Project Path="BlogService.API/BlogService.API.csproj" Id="9f9d5c75-854f-4184-85f4-edc1ca32f56d" />
-    <Project Path="BlogService.Model/BlogService.Model.csproj" Id="05c78ed2-e825-4377-8dc4-ef90e8c8c2d5" />
-    <Project Path="BlogService.Repository/BlogService.Repository.csproj" Id="f67bcb7c-cdac-42dc-b5e9-e28838c0e959" />
-    <Project Path="BlogService.Service/BlogService.Service.csproj" Id="05f24201-aa0f-4c90-81c2-49face003eca" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/BlogService.API/BlogService.API.csproj" Id="9f9d5c75-854f-4184-85f4-edc1ca32f56d" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/BlogService.Model/BlogService.Model.csproj" Id="05c78ed2-e825-4377-8dc4-ef90e8c8c2d5" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/BlogService.Repository/BlogService.Repository.csproj" Id="f67bcb7c-cdac-42dc-b5e9-e28838c0e959" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/BlogService.Service/BlogService.Service.csproj" Id="05f24201-aa0f-4c90-81c2-49face003eca" />
   </Folder>
   <Folder Name="/InventoryService/">
-    <Project Path="InventoryService.API/InventoryService.API.csproj" Id="f1707882-2522-4c13-9057-63c99d072240" />
-    <Project Path="InventoryService.Model/InventoryService.Model.csproj" Id="cfbad737-7f1c-4b43-849d-6fbd7020721d" />
-    <Project Path="InventoryService.Repository/InventoryService.Repository.csproj" Id="b1c08921-fa5c-4b98-9596-4c332d7433aa" />
-    <Project Path="InventoryService.Service/InventoryService.Service.csproj" Id="5f2ee532-8c68-47c2-a339-1c402bb829e1" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/InventoryService.API/InventoryService.API.csproj" Id="f1707882-2522-4c13-9057-63c99d072240" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/InventoryService.Model/InventoryService.Model.csproj" Id="cfbad737-7f1c-4b43-849d-6fbd7020721d" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/InventoryService.Repository/InventoryService.Repository.csproj" Id="b1c08921-fa5c-4b98-9596-4c332d7433aa" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/InventoryService.Service/InventoryService.Service.csproj" Id="5f2ee532-8c68-47c2-a339-1c402bb829e1" />
   </Folder>
   <Folder Name="/ProductCatalogService/">
-    <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
-    <Project Path="ProductCatalogService.Model/ProductCatalogService.Model.csproj" Id="4259e0b5-cebe-4898-9084-87a55815f203" />
-    <Project Path="ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
-    <Project Path="ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/ProductCatalogService.Model/ProductCatalogService.Model.csproj" Id="4259e0b5-cebe-4898-9084-87a55815f203" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
   </Folder>
   <Folder Name="/SharedProject/">
-    <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
+    <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/JwtConfiguration/JwtConfiguration.csproj" />
   </Folder>
-  <Project Path="docker-compose.dcproj">
+  <Project Path="D:/FreshFoodMarket - Git/Fresh_Food_Market_Back_End/docker-compose.dcproj">
     <Build />
   </Project>
 </Solution>

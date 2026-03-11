@@ -13,7 +13,7 @@ namespace InventoryService.Service
     public interface IBatchService
     {
         Task<ApiResponse<BatchDTO>> AddBatchAsync(CreateBatchModel request);
-        Task<ApiResponse<BatchDTO>> UpdateBatchAsync(CreateBatchModel request);
+        Task<ApiResponse<BatchDTO>> UpdateBatchAsync(UpdateBatchModel request, string username, string role);
         Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id);
         Task<ApiResponse<List<BatchDTO>>> GetAllBatchesAsync();
     }

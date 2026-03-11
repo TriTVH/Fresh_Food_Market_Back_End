@@ -115,7 +115,7 @@ namespace ProductCatalogService.Service.Implementor
                     UpdatedAt = p.UpdatedAt
                 }).ToList();
                 await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
-                return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
+                return ApiResponse<List<ProductDTO>>.Ok(null);
             }
             catch (Exception ex)
             {

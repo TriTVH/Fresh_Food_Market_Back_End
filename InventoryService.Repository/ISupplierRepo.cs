@@ -10,5 +10,6 @@ namespace InventoryService.Repository
     public interface ISupplierRepo
     {
         Task<List<Supplier>> GetSuppliers();
+        Task<Supplier> GetSupplierById(int supplierId);
     }
 }

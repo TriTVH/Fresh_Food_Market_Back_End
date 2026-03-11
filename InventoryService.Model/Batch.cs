@@ -9,7 +9,7 @@ public partial class Batch
 
     public int SupplierId { get; set; }
 
-    public string CreatedBy { get; set; } = null!;
+    public string? CreatedBy { get; set; } = null!;
 
     public string BatchCode { get; set; } = null!;
 
