@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductCatalogService.Service;
 using ProductCatalogService.Service.DTO;
+using ProductCatalogService.Service.DTO.Request;
 
 namespace ProductCatalogService.API.Controllers
 {
@@ -47,6 +48,15 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+
+        [HttpPut("quantity")]
+        public async Task<IActionResult> UpdateProductQty([FromBody] UpdateProductQtyRequest request)
+        {
             
+            var response = await _productService.UpdateProductQtyAsync(request);
+     
+                return StatusCode(response.StatusCode, response);
+            
+        }
     }
 }

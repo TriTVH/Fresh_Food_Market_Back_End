@@ -76,7 +76,7 @@ namespace ProductCatalogService.Service.Redis.Implementor
 
             await db.HashSetAsync(RedisKey, entries);
 
-            await db.KeyExpireAsync(RedisKey, TimeSpan.FromHours(1));
+            await db.KeyExpireAsync(RedisKey, TimeSpan.FromMinutes(15));
         }
 
         public async Task SetProductToRedisAsync(ProductDTO product)

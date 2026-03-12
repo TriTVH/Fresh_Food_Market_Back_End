@@ -15,5 +15,7 @@ namespace ProductCatalogService.Service
         Task<ApiResponse<List<ProductDTO>>> GetAllProducts();
         Task<ApiResponse<ProductDTO>> CreateProduct(CreateProductModel request);
         Task<ApiResponse<ProductDTO>> GetProductByIdAsync(int productId);
+        Task<ApiResponse<ProductDTO>> UpdateProductQtyAsync(UpdateProductQtyRequest request);
+        Task<ApiResponse<ProductDTO>> UpdateProductAsync();
     }
 }

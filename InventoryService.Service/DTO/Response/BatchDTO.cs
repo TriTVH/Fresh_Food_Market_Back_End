@@ -29,7 +29,7 @@ namespace InventoryService.Service.DTO.Response
 
         public DateTime? DeliveredDate { get; set; }
 
-        public string? ImageConfirmReceived { get; set; }
+        public List<ImageItem>? ImageConfirmReceived { get; set; }
 
         public BatchNoteModel? Notes { get; set; }
 
@@ -37,9 +37,9 @@ namespace InventoryService.Service.DTO.Response
 
         public DateTime? UpdatedDate { get; set; }
 
-        public List<BatchDeatailDTO> BatchDetails { get; set; }
+        public List<BatchDetailDTO> BatchDetails { get; set; }
     }
-    public class BatchDeatailDTO
+    public class BatchDetailDTO
     {
         public int BatchDetailId { get; set; }
 
