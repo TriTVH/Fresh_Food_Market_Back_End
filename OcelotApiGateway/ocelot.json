@@ -88,20 +88,42 @@
     },
     {
       "SwaggerKey": "blog-service",
-      "UpstreamPathTemplate": "/news/{everything}",
+      "UpstreamPathTemplate": "/news/GUEST",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/news/{everything}",
+      "DownstreamPathTemplate": "/api/news/GUEST",
       "DownstreamHostAndPorts": [
         {
           "Host": "blogservice.api",
           "Port": 7200
         }
-      ],
-      "FileCacheOptions": {
-        "TtlSeconds": 60,
-        "Region": "BlogCache"
-      }
+      ]
+    },
+    {
+      "SwaggerKey": "blog-service",
+      "UpstreamPathTemplate": "/news/{newsId}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/news/{newsId}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "blogservice.api",
+          "Port": 7200
+        }
+      ]
+    },
+    {
+      "SwaggerKey": "blog-service",
+      "UpstreamPathTemplate": "/news",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/news",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "blogservice.api",
+          "Port": 7200
+        }
+      ]
     },
     {
       "SwaggerKey": "inventory-service",
