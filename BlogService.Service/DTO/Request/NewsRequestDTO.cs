@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlogService.Service.DTO.Response
+namespace BlogService.Service.DTO.Request
 {
-    public class NewsDTO
+    public class NewsRequestDTO
     {
-        public int NewsId { get; set; }
-
         public int? SubCategoryId { get; set; }
 
         public string Title { get; set; } = null!;
@@ -23,9 +21,5 @@ namespace BlogService.Service.DTO.Response
         public string? Status { get; set; }
 
         public DateTime? PublishDate { get; set; }
-
-        public DateTime? CreatedDate { get; set; }
-
-        public DateTime? UpdatedDate { get; set; }
     }
 }
