@@ -6,9 +6,9 @@ namespace VoucherService.Repository.Implementor;
 
 public class VoucherDetailRepository : IVoucherDetailRepository
 {
-    private readonly VoucherMgmtFfmContext _context;
+    private readonly PromotionFfmContext _context;
 
-    public VoucherDetailRepository(VoucherMgmtFfmContext context)
+    public VoucherDetailRepository(PromotionFfmContext context)
     {
         _context = context;
     }

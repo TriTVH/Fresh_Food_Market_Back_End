@@ -14,13 +14,15 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddDbContext<VoucherMgmtFfmContext>(options =>
+builder.Services.AddDbContext<PromotionFfmContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
 builder.Services.AddScoped<IVoucherService, VoucherService.Service.Implementor.VoucherService>();
 builder.Services.AddScoped<IVoucherDetailRepository, VoucherDetailRepository>();
 builder.Services.AddScoped<IVoucherDetailService, VoucherDetailService>();
+builder.Services.AddScoped<IDiscountProgramRepository, DiscountProgramRepository>();
+builder.Services.AddScoped<IDiscountProgramService, DiscountProgramService>();
 builder.Services.AddJwtAuthentication();
 
 builder.Services.AddControllers();
