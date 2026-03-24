@@ -41,5 +41,17 @@ namespace AccService.Repository.Implementor
         {
             return await _context.Accounts.FirstOrDefaultAsync(x => x.Phone == phone && x.Password == password && x.IsActive == true);
         }
+
+        public async Task<bool> CheckPhoneExistsAsync(string phone)
+        {
+            return await _context.Accounts.AnyAsync(a => a.Phone == phone);
+        }
+
+        public async Task<bool> CheckUsernameExistsAsync(string username)
+        {
+            return await _context.Accounts.AnyAsync(a => a.Username == username);
+        }
+
+       
     }
 }
