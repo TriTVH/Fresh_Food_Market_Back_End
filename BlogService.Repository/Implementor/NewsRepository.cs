@@ -20,5 +20,30 @@ namespace BlogService.Repository.Implementor
         {
             return await _context.News.ToListAsync();
         }
+
+        public async Task<News?> GetByIdAsync(int newsId)
+        {
+            return await _context.News.FirstOrDefaultAsync(n => n.NewsId == newsId);
+        }
+
+        public async Task<News> CreateAsync(News news)
+        {
+            await _context.News.AddAsync(news);
+            await _context.SaveChangesAsync();
+            return news;
+        }
+
+        public async Task<News> UpdateAsync(News news)
+        {
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+            return news;
+        }
+
+        public async Task DeleteAsync(News news)
+        {
+            _context.News.Remove(news);
+            await _context.SaveChangesAsync();
+        }
     }
 }

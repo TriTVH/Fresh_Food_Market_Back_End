@@ -27,7 +27,24 @@ builder.Services.AddDbContext<ContentMgmtFfmContext>(options =>
 );
 
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
-builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddHttpClient<INewsService, NewsService>(client =>
+{
+    var baseUrl = builder.Configuration["ExternalServices:ProductCatalogBaseUrl"] ?? "http://localhost:7000/";
+    var runningInContainer = string.Equals(
+        Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"),
+        "true",
+        StringComparison.OrdinalIgnoreCase);
+
+    if (runningInContainer &&
+        (baseUrl.Contains("localhost", StringComparison.OrdinalIgnoreCase) ||
+         baseUrl.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase)))
+    {
+        baseUrl = "http://productcatalogservice.api:7000/";
+    }
+
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
 
 builder.Services.AddJwtAuthentication();
 
