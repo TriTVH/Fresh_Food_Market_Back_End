@@ -1,4 +1,4 @@
-﻿using InventoryService.Model;
+﻿﻿using InventoryService.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +11,6 @@ namespace InventoryService.Repository
     {
         Task<List<Supplier>> GetSuppliers();
         Task<Supplier> GetSupplierById(int supplierId);
+        Task<Supplier> CreateSupplier(Supplier supplier);
     }
 }

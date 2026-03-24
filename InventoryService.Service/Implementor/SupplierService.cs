@@ -1,9 +1,12 @@
 ﻿using InventoryService.Repository;
 using InventoryService.Service.DTO;
+using InventoryService.Service.DTO.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InventoryService.Service.Implementors
@@ -28,6 +31,59 @@ namespace InventoryService.Service.Implementors
                 UpdatedAt = e.UpdatedAt
             }).ToList();
             return ApiResponse<List<SupplierDTO>>.Ok(dtos);
+        }
+        public async Task<ApiResponse<SupplierDTO>> CreateSupplierAsync(CreateSupplierModel model)
+        {
+        
+            var httpClient = new HttpClient();
+            var accountPayload = new
+            {
+                email = model.AccountEmail,
+                password = model.AccountPassword,
+                role = model.AccountRole ?? "Supplier"
+            };
+            var accountContent = new StringContent(JsonSerializer.Serialize(accountPayload), Encoding.UTF8, "application/json");
+            HttpResponseMessage accountResp;
+            try
+            {
+                accountResp = await httpClient.PostAsync("http://localhost:5001/api/account", accountContent); // Cập nhật URL thực tế
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<SupplierDTO>.Error(default!, $"Lỗi kết nối AccountService: {ex.Message}", 500);
+            }
+            if (!accountResp.IsSuccessStatusCode)
+            {
+                return ApiResponse<SupplierDTO>.Error(default!, "Tạo account thất bại", (int)accountResp.StatusCode);
+            }
+         
+            var supplier = new Model.Supplier
+            {
+                Name = model.Name,
+                Address = model.Address,
+                Phone = model.Phone,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            try
+            {
+                var created = await _supplierRepo.CreateSupplier(supplier);
+                var dto = new SupplierDTO
+                {
+                    SupplierId = created.SupplierId,
+                    Name = created.Name,
+                    Address = created.Address,
+                    Phone = created.Phone,
+                    CreatedAt = created.CreatedAt,
+                    UpdatedAt = created.UpdatedAt
+                };
+                return ApiResponse<SupplierDTO>.Ok(dto, "Tạo Supplier thành công");
+            }
+            catch (Exception ex)
+            {
+                await httpClient.DeleteAsync("http://localhost:5001/api/account?email=" + Uri.EscapeDataString(model.AccountEmail));
+                return ApiResponse<SupplierDTO>.Error(default!, $"Tạo Supplier thất bại, đã rollback account. Lỗi: {ex.Message}", 500);
+            }
         }
     }
 }
