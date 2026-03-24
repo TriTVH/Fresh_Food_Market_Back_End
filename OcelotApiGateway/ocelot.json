@@ -180,6 +180,19 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "inventory-service",
+      "UpstreamPathTemplate": "/supplier",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/supplier",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice.api",
+          "Port": 7300
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [

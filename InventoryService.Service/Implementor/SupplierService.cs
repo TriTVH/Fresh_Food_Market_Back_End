@@ -40,13 +40,13 @@ namespace InventoryService.Service.Implementors
             {
                 email = model.AccountEmail,
                 password = model.AccountPassword,
-                role = model.AccountRole ?? "Supplier"
+                role = model.AccountRole ?? "4"
             };
             var accountContent = new StringContent(JsonSerializer.Serialize(accountPayload), Encoding.UTF8, "application/json");
             HttpResponseMessage accountResp;
             try
             {
-                accountResp = await httpClient.PostAsync("http://localhost:5001/api/account", accountContent); // Cập nhật URL thực tế
+                accountResp = await httpClient.PostAsync("http://accservice.api:8080/api/account", accountContent); // Cập nhật URL thực tế
             }
             catch (Exception ex)
             {
