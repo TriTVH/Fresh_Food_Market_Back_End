@@ -160,7 +160,94 @@ namespace ProductCatalogService.Service.Implementor
                 return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
             }
         }
+        public async Task<ApiResponse<ProductDTO>> UpdateProduct(UpdateProductModel request)
+        {
+            var existingProduct = await _productRepo.GetProductByIdAsync(request.ProductId);
+            if (existingProduct == null)
+            {
+                return ApiResponse<ProductDTO>.Error(null, "Không tìm thấy sản phẩm để cập nhật", 404);
+            }
 
+            existingProduct.SubCategoryId = request.SubCategoryId;
+            existingProduct.ProductName = request.ProductName;
+            existingProduct.Description = request.Description;
+            existingProduct.ManufacturingLocation = request.ManufacturingLocation;
+            existingProduct.PriceSell = request.PriceSell;
+            existingProduct.Weight = request.Weight;
+            existingProduct.Unit = request.Unit;
+            existingProduct.IsOrganic = request.IsOrganic;
+            existingProduct.Certification = request.Certification;
+            existingProduct.ImagesJson = request.ImagesJson;
+            existingProduct.IsAvailable = request.IsAvailable ?? existingProduct.IsAvailable;
+            existingProduct.UpdatedAt = DateTime.UtcNow;
 
+            await _productRepo.UpdateAsync(existingProduct);
+
+            var productDto = MapToDTO(existingProduct);
+
+            await _productRedisCacheService.SetProductToRedisAsync(productDto);
+
+            return ApiResponse<ProductDTO>.Ok(productDto, "Cập nhật thành công", 200);
+        }
+
+        public async Task<ApiResponse<bool>> DeleteProduct(int productId)
+        {
+            var isDeleted = await _productRepo.DeleteAsync(productId);
+            if (!isDeleted)
+            {
+                return ApiResponse<bool>.Error(false, "Sản phẩm không tồn tại hoặc đã bị xóa", 404);
+            }
+
+            await _productRedisCacheService.RemoveProductFromRedisAsync(productId);
+
+            return ApiResponse<bool>.Ok(true, "Xóa sản phẩm thành công", 200);
+        }
+        private ProductDTO MapToDTO(Product p)
+        {
+            return new ProductDTO
+            {
+                ProductId = p.ProductId,
+                ProductName = p.ProductName,
+                SubCategoryName = p.SubCategory?.SubCategoryName,
+                CategoryName = p.SubCategory?.Category?.CategoryName,
+                Description = p.Description,
+                PriceSell = p.PriceSell,
+                Quantity = p.Quantity,
+                Weight = p.Weight,
+                Unit = p.Unit,
+                IsOrganic = p.IsOrganic,
+                Certification = p.Certification,
+                IsAvailable = p.IsAvailable,
+                ImagesJson = p.ImagesJson,
+                RatingCount = p.RatingCount,
+                RatingAverage = p.RatingAverage,
+                SoldCount = p.SoldCount,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            };
+        }
+        public async Task<ApiResponse<List<ProductDTO>>> GetAllProducts(string? search = null)
+        {
+            var cachedProducts = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+
+            if (cachedProducts == null || !cachedProducts.Any())
+            {
+                await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
+                cachedProducts = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+            }
+
+            var result = cachedProducts.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var keyword = search.Trim().ToLower();
+                result = result.Where(p =>
+                    (p.ProductName != null && p.ProductName.ToLower().Contains(keyword)) ||
+                    (p.ProductId.ToString().Contains(keyword)) 
+                );
+            }
+
+            return ApiResponse<List<ProductDTO>>.Ok(result.ToList(), "Lấy dữ liệu thành công", 200);
+        }
     }
 }

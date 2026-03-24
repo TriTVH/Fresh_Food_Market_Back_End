@@ -55,8 +55,18 @@ namespace ProductCatalogService.Repository.Implementor
             await _context.SaveChangesAsync();
             return entry.Entity;
         }
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return false;
+            }
 
-     
-
+            product.IsAvailable = false;
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
