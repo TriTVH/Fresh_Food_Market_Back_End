@@ -36,7 +36,7 @@ builder.Services.AddDbContext<ProductCatalogMgmtFfmContext>(options =>
 //    ConnectionMultiplexer.Connect("redis:6379")
 //);
 builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false")
+    ConnectionMultiplexer.Connect("redis:6379")
 );
 builder.Services.AddScoped<IProductRedisCacheService, ProductRedisCacheService>();
 
