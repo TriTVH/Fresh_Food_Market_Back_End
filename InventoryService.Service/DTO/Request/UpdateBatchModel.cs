@@ -31,7 +31,6 @@ namespace InventoryService.Service.DTO.Request
         public int Quantity { get; set; }
         public DateOnly? ExpiredDate { get; set; }
 
-        public decimal Price { get; set; }
     }
 
     public class MissingSupplyNote

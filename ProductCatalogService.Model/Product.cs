@@ -53,7 +53,7 @@ public partial class Product
                 : JsonSerializer.Serialize(value);
         }
     }
-    public bool? IsAvailable { get; set; }
+    public bool IsAvailable { get; set; }
 
     public int? SoldCount { get; set; }
 

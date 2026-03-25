@@ -10,6 +10,10 @@ namespace ProductCatalogService.Service.DTO.Request
 {
     public class UpdateProductModel
     {
+
+        [Required]
+        public int ProductId { get; set; }
+
         [Required(ErrorMessage = "Sub Category Id is required")]
         public int SubCategoryId { get; set; }
 
@@ -19,6 +23,10 @@ namespace ProductCatalogService.Service.DTO.Request
 
         [MaxLength(4000, ErrorMessage = "Description cannot exceed 4000 characters")]
         public string? Description { get; set; }
+
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Product quantity must be positive number")]
+        public int ProductQty { get; set; }
 
         [Required]
         [MaxLength(255, ErrorMessage = "Manufacturing Location cannot exceed 255 characters")]

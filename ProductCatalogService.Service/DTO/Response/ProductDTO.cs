@@ -34,7 +34,7 @@ namespace ProductCatalogService.Service.DTO.Response
 
         public string? Certification { get; set; }
 
-        public bool? IsAvailable { get; set; }
+        public bool IsAvailable { get; set; }
 
         public int? SoldCount { get; set; }
 

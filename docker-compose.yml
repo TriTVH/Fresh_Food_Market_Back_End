@@ -29,7 +29,14 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
+  orderser.api:
+    image: ffm-orderserapi
+    build:
+      context: .
+      dockerfile: OrderSer.API/Dockerfile
+
 volumes:
    rabbitmq_data:
+
 
 

@@ -23,8 +23,6 @@ namespace InventoryService.Service.DTO.Response
 
         public int? TotalItems { get; set; }
 
-        public decimal? TotalPrice { get; set; }
-
         public string? Status { get; set; }
 
         public DateTime? DeliveredDate { get; set; }
@@ -47,8 +45,6 @@ namespace InventoryService.Service.DTO.Response
         public string ProductName { get; set; }
 
         public int Quantity { get; set; }
-
-        public decimal Price { get; set; }
 
         public DateOnly? ExpiredDate { get; set; }
     }

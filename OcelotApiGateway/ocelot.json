@@ -175,10 +175,29 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "order-service",
+      "UpstreamPathTemplate": "/order",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/order",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderser.api",
+          "Port": 9001
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "OrderCache"
+      }
     }
   ],
   "SwaggerEndPoints": [
-
     {
       "Key": "acc-service",
       "Config": [
@@ -216,6 +235,16 @@
           "Name": "Inventory Service",
           "Version": "v1",
           "Url": "http://inventoryservice.api:7300/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "order-service",
+      "Config": [
+        {
+          "Name": "Order Service",
+          "Version": "v1",
+          "Url": "http://orderser.api:9001/swagger/v1/swagger.json"
         }
       ]
     }

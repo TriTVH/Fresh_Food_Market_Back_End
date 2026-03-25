@@ -8,12 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddJwtAuthentication();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
+});
+
 // Add services to the container.
 builder.Configuration.AddJsonFile(
                "ocelot.json",
                optional: false,
                reloadOnChange: true
            );
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddOcelot(builder.Configuration)
@@ -42,6 +54,8 @@ if (app.Environment.IsDevelopment())
         opt.PathToSwaggerGenerator = "/swagger/docs";
     });
 }
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

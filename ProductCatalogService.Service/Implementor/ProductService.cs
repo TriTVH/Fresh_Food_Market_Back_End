@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using ProductCatalogService.Model;
 using ProductCatalogService.Model.DBContext;
 using ProductCatalogService.Repository;
@@ -56,14 +57,16 @@ namespace ProductCatalogService.Service.Implementor
                     }
                 }
 
+                var finalProductName = $"{request.ProductName} ({request.Weight} {request.Unit})";
+
                 var product = new Product
                 {
                     SubCategoryId = request.SubCategoryId,
-                    ProductName = request.ProductName,
+                    ProductName = finalProductName,
                     Description = request.Description,
                     ManufacturingLocation = request.ManufacturingLocation,
                     PriceSell = request.PriceSell,
-                    Quantity = 0,
+                    Quantity = request.ProductQty,
                     Weight = request.Weight,
                     Unit = request.Unit,
                     IsOrganic = request.IsOrganic,
@@ -74,42 +77,7 @@ namespace ProductCatalogService.Service.Implementor
                     UpdatedAt = DateTime.UtcNow
                 };
                 var created = await _productRepo.CreateAsync(product);
-
-                var productDTO = new ProductDTO()
-                {
-                    ProductId = created.ProductId,
-                    ProductName = created.ProductName,
-                    SubCategoryId = created.SubCategoryId,
-                    SubCategoryName = created.SubCategory.SubCategoryName,
-                    CategoryName = created.SubCategory.Category.CategoryName,
-                    Description = created.Description,
-                    PriceSell = created.PriceSell,
-                    Quantity = created.Quantity,
-                    Weight = created.Weight,
-                    Unit = created.Unit,
-                    IsOrganic = created.IsOrganic,
-                    Certification = created.Certification,
-                    IsAvailable = created.IsAvailable,
-                    ImagesJson = created.ImagesJson,
-                    RatingCount = created.RatingCount,
-                    RatingAverage = created.RatingAverage,
-                    SoldCount = created.SoldCount,
-                    CreatedAt = created.CreatedAt,
-                    UpdatedAt = created.UpdatedAt
-                };
-
-                var productsFromRedis = await _productRedisCacheService.GetAllProductsFromRedisAsync();
-
-                if (productsFromRedis == null || !productsFromRedis.Any())
-                {
-                    await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
-                }
-                else
-                {
-                    productsFromRedis.Add(productDTO);
-                    await _productRedisCacheService.SetAllProductsToRedisAsync(productsFromRedis);
-                }
-
+                await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
 
                 return ApiResponse<ProductDTO>.Ok(null, "Product created successfully", 201);
             }
@@ -118,6 +86,62 @@ namespace ProductCatalogService.Service.Implementor
                 return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
             }
         }
+
+        public async Task<ApiResponse<List<ProductDTO>>> GetActiveProducts()
+        {
+            try
+            {
+                var productsFromRedis = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+
+                if (productsFromRedis != null && productsFromRedis.Any())
+                {
+                    var activeProductsFromRedis = productsFromRedis
+                        .Where(p => p.IsAvailable)
+                        .ToList();
+
+                    return ApiResponse<List<ProductDTO>>.Ok(activeProductsFromRedis);
+                }
+
+                var products = await _productRepo.GetAllProducts();
+
+                var productDTOs = products.Select(p => new ProductDTO
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    SubCategoryId = p.SubCategoryId,
+                    SubCategoryName = p.SubCategory.SubCategoryName,
+                    CategoryName = p.SubCategory.Category.CategoryName,
+                    Description = p.Description,
+                    PriceSell = p.PriceSell,
+                    ManufacturingLocation = p.ManufacturingLocation,
+                    Quantity = p.Quantity,
+                    Weight = p.Weight,
+                    Unit = p.Unit,
+                    IsOrganic = p.IsOrganic,
+                    Certification = p.Certification,
+                    IsAvailable = p.IsAvailable,
+                    ImagesJson = p.ImagesJson,
+                    RatingCount = p.RatingCount,
+                    RatingAverage = p.RatingAverage,
+                    SoldCount = p.SoldCount,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt
+                }).ToList();
+
+                await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
+
+                var activeProducts = productDTOs
+                    .Where(p => p.IsAvailable)
+                    .ToList();
+
+                return ApiResponse<List<ProductDTO>>.Ok(activeProducts);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<ProductDTO>>.Error(null, ex.Message, 500);
+            }
+        }
+
         public async Task<ApiResponse<List<ProductDTO>>> GetAllProducts()
         {
             try
@@ -140,6 +164,7 @@ namespace ProductCatalogService.Service.Implementor
                     Description = p.Description,
                     PriceSell = p.PriceSell,
                     Quantity = p.Quantity,
+                    ManufacturingLocation = p.ManufacturingLocation,
                     Weight = p.Weight,
                     Unit = p.Unit,
                     IsOrganic = p.IsOrganic,
@@ -153,7 +178,7 @@ namespace ProductCatalogService.Service.Implementor
                     UpdatedAt = p.UpdatedAt
                 }).ToList();
                 await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
-                return ApiResponse<List<ProductDTO>>.Ok(null);
+                return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
             }
             catch (Exception ex)
             {
@@ -185,6 +210,7 @@ namespace ProductCatalogService.Service.Implementor
                     IsOrganic = product.IsOrganic,
                     Certification = product.Certification,
                     IsAvailable = product.IsAvailable,
+                    ManufacturingLocation = product.ManufacturingLocation,
                     ImagesJson = product.ImagesJson,
                     RatingCount = product.RatingCount,
                     RatingAverage = product.RatingAverage,
@@ -200,9 +226,85 @@ namespace ProductCatalogService.Service.Implementor
             }
         }
 
-        public Task<ApiResponse<ProductDTO>> UpdateProductAsync()
+        public async Task<ApiResponse<ProductDTO>> UpdateProductAsync(UpdateProductModel request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var product = await _productRepo.GetProductByIdAsync(request.ProductId);
+                if (product == null)
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "Product not found", 404);
+                }
+
+                var subCategory = await _subCategoryRepo.GetSubCategoryById(request.SubCategoryId);
+                if (subCategory == null)
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "Sub Category not found", 404);
+                }
+
+                if (request.ImagesJson == null || !request.ImagesJson.Any())
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "At least one image is required", 400);
+                }
+
+                if (request.ImagesJson.Count == 1)
+                {
+                    request.ImagesJson[0].Primary = true;
+                }
+                else
+                {
+                    var primaryImages = request.ImagesJson.Where(x => x.Primary).ToList();
+
+                    if (primaryImages.Count == 0)
+                    {
+                        request.ImagesJson[0].Primary = true;
+                    }
+                    else if (primaryImages.Count > 1)
+                    {
+                        return ApiResponse<ProductDTO>.Error(null, "Only one image can be set as primary", 400);
+                    }
+                }
+
+
+                product.SubCategoryId = request.SubCategoryId;
+                product.ProductName = request.ProductName;
+                product.Description = request.Description;
+                product.ManufacturingLocation = request.ManufacturingLocation;
+                product.PriceSell = request.PriceSell;
+                product.Quantity = request.ProductQty;
+                product.Weight = request.Weight;
+                product.Unit = request.Unit;
+                product.IsOrganic = request.IsOrganic;
+                product.Certification = request.Certification;
+                product.ImagesJson = request.ImagesJson;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                var updated = await _productRepo.UpdateAsync(product);
+                await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
+
+                var result = new ProductDTO
+                {
+                    ProductId = updated.ProductId,
+                    ProductName = updated.ProductName,
+                    SubCategoryId = updated.SubCategoryId,
+                    Description = updated.Description,
+                    ManufacturingLocation = updated.ManufacturingLocation,
+                    PriceSell = updated.PriceSell,
+                    Quantity = updated.Quantity,
+                    Weight = updated.Weight,
+                    Unit = updated.Unit,
+                    IsOrganic = updated.IsOrganic,
+                    Certification = updated.Certification,
+                    IsAvailable = updated.IsAvailable,
+                    ImagesJson = updated.ImagesJson
+                };
+
+                return ApiResponse<ProductDTO>.Ok(result, "Product updated successfully", 200);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
+            }
         }
 
         public async Task<ApiResponse<ProductDTO>> UpdateProductQtyAsync(UpdateProductQtyRequest request)

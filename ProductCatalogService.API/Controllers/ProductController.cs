@@ -27,6 +27,34 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById([FromRoute] int id)
+        {
+            var response = await _productService.GetProductByIdAsync(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveProducts()
+        {
+            var response = await _productService.GetActiveProducts();
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] Service.DTO.Request.CreateProductModel request)
         {
@@ -39,6 +67,28 @@ namespace ProductCatalogService.API.Controllers
                 return BadRequest(ApiResponse<object>.Error(null, firstError, 400));
             }
             var response = await _productService.CreateProduct(request);
+            if (response.Success)
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductModel request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .FirstOrDefault()?.ErrorMessage;
+
+                return BadRequest(ApiResponse<object>.Error(null, firstError, 400));
+            }
+            var response = await _productService.UpdateProductAsync(request);
             if (response.Success)
             {
                 return StatusCode(response.StatusCode, response);

@@ -112,7 +112,6 @@ namespace InventoryService.Service.Implementors
                     SupplyBy = b.CreatedBy,
                     BatchCode = b.BatchCode,
                     TotalItems = b.TotalItems,
-                    TotalPrice = b.TotalPrice,
                     Status = b.Status,
                     DeliveredDate = b.DeliveredDate,
                     CreatedDate = b.CreatedDate,
@@ -145,7 +144,6 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                 SupplyBy = batch.CreatedBy,
                 BatchCode = batch.BatchCode,
                 TotalItems = batch.TotalItems,
-                TotalPrice = batch.TotalPrice,
                 Status = batch.Status,
                 DeliveredDate = batch.DeliveredDate,
                 ImageConfirmReceived = DesializeImageItem(batch.ImageConfirmReceived),
@@ -159,7 +157,6 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     ProductId = d.ProductId,
                     ProductName = d.ProductName,
                     Quantity = d.Quantity,
-                    Price = d.Subtotal,
                     ExpiredDate = d.ExpiredDate
                 }).ToList()
             };
@@ -258,6 +255,15 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                         var requiredQuantity = detail.Quantity;
                         var providedQuantity = item.Quantity;
 
+                        if (providedQuantity > requiredQuantity)
+                        {
+                            return ApiResponse<BatchDTO>.Error(
+                                null,
+                                $"Provided quantity for BatchDetailId {item.Id} cannot exceed required quantity of {requiredQuantity}.",
+                                400
+                            );
+                        }
+
                         if (providedQuantity < requiredQuantity)
                         {
                             if (providedQuantity == 0)
@@ -271,31 +277,24 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                                     Provided = providedQuantity,
                                     Missing = requiredQuantity - providedQuantity
                                 });
+                                detail.Quantity = providedQuantity;
+                                detail.ExpiredDate = item.ExpiredDate;
                                 continue;
                             }
-                            else
+
+                            insufficientSupplyNote.Add(new MissingSupplyNote
                             {
-                                insufficientSupplyNote.Add(new MissingSupplyNote
-                                {
-                                    BatchDetailId = detail.BatchDetailId,
-                                    ProductId = detail.ProductId,
-                                    ProductName = detail.ProductName ?? string.Empty,
-                                    Required = requiredQuantity,
-                                    Provided = providedQuantity,
-                                    Missing = requiredQuantity - providedQuantity
-                                });
-                            }  
-                        } else
-                        {
-                            return ApiResponse<BatchDTO>.Error(
-                                null,
-                                $"Provided quantity for BatchDetailId {item.Id} cannot exceed required quantity of {requiredQuantity}.",
-                                400
-                            );
+                                BatchDetailId = detail.BatchDetailId,
+                                ProductId = detail.ProductId,
+                                ProductName = detail.ProductName ?? string.Empty,
+                                Required = requiredQuantity,
+                                Provided = providedQuantity,
+                                Missing = requiredQuantity - providedQuantity
+                            });
                         }
+
                         detail.Quantity = providedQuantity;
                         detail.ExpiredDate = item.ExpiredDate;
-                        detail.Subtotal = item.Price;
                     }
 
                     note.InsufficientSupplyNote = insufficientSupplyNote;
@@ -357,6 +356,8 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                                 Extra = 0,
                                 Status = "INSUFFICIENT"
                             });
+                            continue;
+
                         }
 
                         var provided = item.Quantity;
@@ -386,7 +387,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                             note.CancelInfo = new CancelInfoNote
                             {
                                 CancelledAt = DateTime.UtcNow,
-                                Reason = sagaResult + ". Batch cancelled due to data inconsistency. Please review the batch details and create a new batch if needed."
+                                Reason = sagaResult + ". Batch cancelled due to data inconsistency. Please review the batch details and product information, then create a new batch if needed."
                             };
 
                             batch.Notes = SerializeBatchNote(note);
@@ -398,13 +399,13 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                                 return ApiResponse<BatchDTO>.Error(
                                     null,
                                     sagaResult+ ". Batch cancelled due to data inconsistency.",
-                                    400
+                                    409
                                 );
                         }
                         return ApiResponse<BatchDTO>.Error(
                              null,
                              sagaResult+ ". Please try again later.",
-                             400
+                             500
                          );
                     }
 
@@ -423,7 +424,11 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                             400
                         );
                     }
+
+
+
                     note = DeserializeBatchNote(batch.Notes);
+                    
                     note.CancelInfo = new CancelInfoNote
                     {
                         CancelledAt = DateTime.UtcNow,
