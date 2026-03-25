@@ -25,18 +25,18 @@ namespace InventoryService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] InventoryService.Service.DTO.Request.CreateSupplierModel model)
-        {
-            var response = await _service.CreateSupplierAsync(model);
-            if (response.Success)
-            {
-                return Ok(response);
-            }
-            else
-            {
-                return StatusCode(response.StatusCode, response);
-            }
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> Create([FromBody] InventoryService.Service.DTO.Request.CreateSupplierModel model)
+        //{
+        //    var response = await _service.CreateSupplierAsync(model);
+        //    if (response.Success)
+        //    {
+        //        return Ok(response);
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(response.StatusCode, response);
+        //    }
+        //}
     }
 }

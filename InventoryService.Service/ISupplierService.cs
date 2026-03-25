@@ -11,6 +11,6 @@ namespace InventoryService.Service
     public interface ISupplierService
     {
         Task<ApiResponse<List<SupplierDTO>>> GetSuppliers();
-        Task<ApiResponse<SupplierDTO>> CreateSupplierAsync(CreateSupplierModel model);
+        //Task<ApiResponse<SupplierDTO>> CreateSupplierAsync(CreateSupplierModel model);
     }
 }

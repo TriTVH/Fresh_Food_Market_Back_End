@@ -18,7 +18,6 @@ namespace ProductCatalogService.Service
 
         Task<ApiResponse<ProductDTO>> UpdateProduct(UpdateProductModel request);
         Task<ApiResponse<bool>> DeleteProduct(int productId);
-        // Hỗ trợ search giống UI FE
         Task<ApiResponse<List<ProductDTO>>> GetAllProducts(string? search = null);
     }
 }
