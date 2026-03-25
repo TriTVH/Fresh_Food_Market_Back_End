@@ -66,6 +66,23 @@
         "AuthenticationProviderKey": "Bearer"
       }
     },
+
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/product/{everything}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/product/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 7000
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
     {
       "SwaggerKey": "product-catalog-service",
       "UpstreamPathTemplate": "/sub-category/{everything}",
@@ -182,6 +199,7 @@
       }
     },
     {
+
       "SwaggerKey": "voucher-service",
       "UpstreamPathTemplate": "/voucher/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
@@ -207,7 +225,7 @@
         {
           "Host": "voucherservice.api",
           "Port": 7400
-        }
+      }
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
@@ -279,7 +297,6 @@
     }
   ],
   "SwaggerEndPoints": [
-
     {
       "Key": "acc-service",
       "Config": [
@@ -321,6 +338,7 @@
       ]
     },
     {
+
       "Key": "voucher-service",
       "Config": [
         {

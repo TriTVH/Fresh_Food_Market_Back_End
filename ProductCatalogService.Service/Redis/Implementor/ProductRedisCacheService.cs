@@ -76,7 +76,7 @@ namespace ProductCatalogService.Service.Redis.Implementor
 
             await db.HashSetAsync(RedisKey, entries);
 
-            await db.KeyExpireAsync(RedisKey, TimeSpan.FromHours(1));
+            await db.KeyExpireAsync(RedisKey, TimeSpan.FromMinutes(15));
         }
 
         public async Task SetProductToRedisAsync(ProductDTO product)
@@ -88,7 +88,7 @@ namespace ProductCatalogService.Service.Redis.Implementor
                 product.ProductId.ToString(),
                 JsonSerializer.Serialize(product));
 
-            await db.KeyExpireAsync(RedisKey, TimeSpan.FromHours(1));
+            await db.KeyExpireAsync(RedisKey, TimeSpan.FromMinutes(5));
         }
 
         public async Task RemoveProductFromRedisAsync(int productId)
@@ -112,8 +112,10 @@ namespace ProductCatalogService.Service.Redis.Implementor
             {
                 ProductId = p.ProductId,
                 ProductName = p.ProductName,
+                SubCategoryId = p.SubCategoryId,
                 SubCategoryName = p.SubCategory.SubCategoryName,
                 CategoryName = p.SubCategory.Category.CategoryName,
+                ManufacturingLocation = p.ManufacturingLocation,
                 Description = p.Description,
                 PriceSell = p.PriceSell,
                 Quantity = p.Quantity,

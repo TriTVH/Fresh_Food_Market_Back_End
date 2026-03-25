@@ -42,5 +42,11 @@ namespace AccService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+        {
+            var result = await _jwtTokenService.RefreshTokenAsync(request);
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }

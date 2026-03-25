@@ -23,13 +23,11 @@ namespace InventoryService.Service.DTO.Response
 
         public int? TotalItems { get; set; }
 
-        public decimal? TotalPrice { get; set; }
-
         public string? Status { get; set; }
 
         public DateTime? DeliveredDate { get; set; }
 
-        public string? ImageConfirmReceived { get; set; }
+        public List<ImageItem>? ImageConfirmReceived { get; set; }
 
         public BatchNoteModel? Notes { get; set; }
 
@@ -37,9 +35,9 @@ namespace InventoryService.Service.DTO.Response
 
         public DateTime? UpdatedDate { get; set; }
 
-        public List<BatchDeatailDTO> BatchDetails { get; set; }
+        public List<BatchDetailDTO> BatchDetails { get; set; }
     }
-    public class BatchDeatailDTO
+    public class BatchDetailDTO
     {
         public int BatchDetailId { get; set; }
 
@@ -47,8 +45,6 @@ namespace InventoryService.Service.DTO.Response
         public string ProductName { get; set; }
 
         public int Quantity { get; set; }
-
-        public decimal Price { get; set; }
 
         public DateOnly? ExpiredDate { get; set; }
     }

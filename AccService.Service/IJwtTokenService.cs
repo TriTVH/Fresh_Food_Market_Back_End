@@ -11,6 +11,7 @@ namespace AccService.Service
 {
     public interface IJwtTokenService
     {
+        Task<ApiResponse<AuthenticationToken>> RefreshTokenAsync(RefreshTokenRequest request);
         Task<ApiResponse<AccountDTO>> CreateBuyerAccountAsync(RegisterModel request);
         Task<ApiResponse<AuthenticationToken>> GenerateAuthToken(LoginModel loginModel);
     }
