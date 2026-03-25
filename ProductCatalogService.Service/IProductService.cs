@@ -18,6 +18,5 @@ namespace ProductCatalogService.Service
         Task<ApiResponse<ProductDTO>> UpdateProductQtyAsync(UpdateProductQtyRequest request);
         Task<ApiResponse<ProductDTO>> UpdateProductAsync(UpdateProductModel request);
         Task<ApiResponse<List<ProductDTO>>> GetActiveProducts();
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AccService.Service;
+using AccService.Service.DTO.RequestObject;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,27 @@ namespace AccService.API.Controllers
             }
             else            {
                 return StatusCode(response.StatusCode, response);
+            }
+        }
+        [HttpPost("supplierAcc")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> CreateSupplierAccount([FromBody] CreateSupplierAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { Success = false, StatusCode = 400, Message = "Validation failed", Errors = errors });
+            }
+
+            var response = await _accountService.CreateSupplierAccountAsync(request);
+
+            if (response.Success)
+            {
+                return StatusCode(201, response); 
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response); 
             }
         }
     }
