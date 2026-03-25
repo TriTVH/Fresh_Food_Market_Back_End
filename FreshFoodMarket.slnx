@@ -32,6 +32,15 @@
     <Project Path="VoucherService.Repository/VoucherService.Repository.csproj" />
     <Project Path="VoucherService.Service/VoucherService.Service.csproj" />
   </Folder>
+  <Folder Name="/InventoryService_Redis/">
+    <Project Path="InventoryService_Redis.API/InventoryService_Redis.API.csproj" />
+  </Folder>
+  <Folder Name="/OrderService_Redis/">
+    <Project Path="OrderService_Redis.API/OrderService_Redis.API.csproj" />
+  </Folder>
+  <Folder Name="/RedisConfiguration/">
+    <Project Path="RedisConfiguration/RedisConfiguration.csproj" />
+  </Folder>
   <Folder Name="/SharedProject/">
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
   </Folder>

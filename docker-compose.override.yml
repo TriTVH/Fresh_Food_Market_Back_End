@@ -59,6 +59,28 @@ services:
       - ffm-network
     restart: always
 
+  orderservice_redis.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7500
+      - ConnectionStrings__Redis=redis:6379,abortConnect=false
+    ports:
+      - "7500:7500"
+    networks:
+      - ffm-network
+    restart: always
+
+  inventoryservice_redis.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7600
+      - ConnectionStrings__Redis=redis:6379,abortConnect=false
+    ports:
+      - "7600:7600"
+    networks:
+      - ffm-network
+    restart: always
+
   voucherservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

@@ -29,6 +29,18 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
+  orderservice_redis.api:
+    image: ffm-orderservice_redisapi
+    build:
+      context: .
+      dockerfile: OrderService_Redis.API/Dockerfile
+
+  inventoryservice_redis.api:
+    image: ffm-inventoryservice_redisapi
+    build:
+      context: .
+      dockerfile: InventoryService_Redis.API/Dockerfile
+
   voucherservice.api:
     image: ffm-voucherserviceapi
     build:
