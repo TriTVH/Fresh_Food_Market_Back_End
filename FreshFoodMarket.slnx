@@ -30,7 +30,7 @@
     <Project Path="OrderSer.Service/OrderSer.Service.csproj" />
   </Folder>
   <Folder Name="/OrderService_Redis/">
-    <Project Path="OrderService.API/OrderService.API.csproj" Id="c28af62a-e0e2-435d-8b16-c6b6d536fd96" />
+    <Project Path="OrderService_Redis.API/OrderService_Redis.API.csproj" Id="c28af62a-e0e2-435d-8b16-c6b6d536fd96" />
   </Folder>
   <Folder Name="/ProductCatalogService/">
     <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
@@ -44,15 +44,7 @@
     <Project Path="VoucherService.Repository/VoucherService.Repository.csproj" />
     <Project Path="VoucherService.Service/VoucherService.Service.csproj" />
   </Folder>
-  <Folder Name="/InventoryService_Redis/">
-    <Project Path="InventoryService_Redis.API/InventoryService_Redis.API.csproj" />
-  </Folder>
-  <Folder Name="/OrderService_Redis/">
-    <Project Path="OrderService_Redis.API/OrderService_Redis.API.csproj" />
-  </Folder>
-  <Folder Name="/RedisConfiguration/">
-    <Project Path="RedisConfiguration/RedisConfiguration.csproj" />
-  </Folder>
+
   <Folder Name="/SharedProject/">
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
     <Project Path="RedisConfiguration/RedisConfiguration.csproj" Id="a6bd9f8e-4543-4587-80b2-286297083ae9" />
