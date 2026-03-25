@@ -10,7 +10,7 @@ namespace BlogService.Service.DTO.Response
     {
         public int NewsId { get; set; }
 
-        public int? StaffId { get; set; }
+        public int? SubCategoryId { get; set; }
 
         public string Title { get; set; } = null!;
 

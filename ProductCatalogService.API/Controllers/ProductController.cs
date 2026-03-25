@@ -77,9 +77,15 @@ namespace ProductCatalogService.API.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductModel request)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductModel request)
         {
+            if (id != request.ProductId)
+            {
+                return BadRequest(ApiResponse<object>.Error(null, "ID trên route và trong body không khớp", 400));
+            }
+
+
             if (!ModelState.IsValid)
             {
                 var firstError = ModelState.Values
@@ -108,5 +114,24 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             
         }
+
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteProduct(int id)
+        //{
+        //    var response = await _productService.DeleteProduct(id);
+        //    return response.Success ? Ok(response) : StatusCode(response.StatusCode, response);
+        //}
+
+        //[HttpGet("search")]
+        //public async Task<IActionResult> GetListProducts([FromQuery] string? search)
+        //{
+        //    var response = await _productService.GetAllProducts(search);
+
+        //    if (response.Success)
+        //    {
+        //        return Ok(response);
+        //    }
+        //    return StatusCode(response.StatusCode, response);
+        //}
     }
 }

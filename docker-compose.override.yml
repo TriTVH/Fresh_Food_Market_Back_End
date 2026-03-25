@@ -3,6 +3,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5000
+    depends_on:
+      - accservice.api
+      - productcatalogservice.api
+      - blogservice.api
+      - inventoryservice.api
     ports:
       - "5000:5000"
     networks:
@@ -38,6 +43,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=7200
+      - ExternalServices__ProductCatalogBaseUrl=http://productcatalogservice.api:7000/
     ports:
       - "7200:7200" 
     networks:
@@ -49,6 +55,16 @@ services:
       - ASPNETCORE_HTTP_PORTS=7300
     ports:
       - "7300:7300"
+    networks:
+      - ffm-network
+    restart: always
+
+  voucherservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7400
+    ports:
+      - "7400:7400"
     networks:
       - ffm-network
     restart: always

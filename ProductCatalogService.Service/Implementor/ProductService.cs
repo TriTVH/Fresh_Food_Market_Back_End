@@ -225,7 +225,7 @@ namespace ProductCatalogService.Service.Implementor
                 return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
             }
         }
-
+   
         public async Task<ApiResponse<ProductDTO>> UpdateProductAsync(UpdateProductModel request)
         {
             try
@@ -345,6 +345,7 @@ namespace ProductCatalogService.Service.Implementor
             }
 
             return ApiResponse<ProductDTO>.Ok(null, "Product quantity updated successfully");
+
         }
     }
 }

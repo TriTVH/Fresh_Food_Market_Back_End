@@ -38,6 +38,12 @@
     <Project Path="ProductCatalogService.Repository/ProductCatalogService.Repository.csproj" Id="11ebbfda-ee3f-4a65-a2f8-f4ca83a2074d" />
     <Project Path="ProductCatalogService.Service/ProductCatalogService.Service.csproj" Id="9a1f7528-3ab9-4f10-afdb-60d287a86687" />
   </Folder>
+  <Folder Name="/VoucherService/">
+    <Project Path="VoucherService.API/VoucherService.API.csproj" />
+    <Project Path="VoucherService.Model/VoucherService.Model.csproj" />
+    <Project Path="VoucherService.Repository/VoucherService.Repository.csproj" />
+    <Project Path="VoucherService.Service/VoucherService.Service.csproj" />
+  </Folder>
   <Folder Name="/SharedProject/">
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
     <Project Path="RedisConfiguration/RedisConfiguration.csproj" Id="a6bd9f8e-4543-4587-80b2-286297083ae9" />

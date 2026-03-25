@@ -29,11 +29,12 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
-  orderser.api:
-    image: ffm-orderserapi
+
+  voucherservice.api:
+    image: ffm-voucherserviceapi
     build:
       context: .
-      dockerfile: OrderSer.API/Dockerfile
+      dockerfile: VoucherService.API/Dockerfile
 
 volumes:
    rabbitmq_data:

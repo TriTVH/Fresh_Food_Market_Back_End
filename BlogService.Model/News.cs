@@ -9,6 +9,8 @@ public partial class News
 
     public int? StaffId { get; set; }
 
+    public int? SubCategoryId { get; set; }
+
     public string Title { get; set; } = null!;
 
     public string Content { get; set; } = null!;

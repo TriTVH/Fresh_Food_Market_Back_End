@@ -105,20 +105,42 @@
     },
     {
       "SwaggerKey": "blog-service",
-      "UpstreamPathTemplate": "/news/{everything}",
+      "UpstreamPathTemplate": "/news/GUEST",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/news/{everything}",
+      "DownstreamPathTemplate": "/api/news/GUEST",
       "DownstreamHostAndPorts": [
         {
           "Host": "blogservice.api",
           "Port": 7200
         }
-      ],
-      "FileCacheOptions": {
-        "TtlSeconds": 60,
-        "Region": "BlogCache"
-      }
+      ]
+    },
+    {
+      "SwaggerKey": "blog-service",
+      "UpstreamPathTemplate": "/news/{newsId}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/news/{newsId}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "blogservice.api",
+          "Port": 7200
+        }
+      ]
+    },
+    {
+      "SwaggerKey": "blog-service",
+      "UpstreamPathTemplate": "/news",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/news",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "blogservice.api",
+          "Port": 7200
+        }
+      ]
     },
     {
       "SwaggerKey": "inventory-service",
@@ -177,23 +199,36 @@
       }
     },
     {
-      "SwaggerKey": "order-service",
-      "UpstreamPathTemplate": "/order",
-      "UpstreamHttpMethod": [ "GET" ],
+
+      "SwaggerKey": "voucher-service",
+      "UpstreamPathTemplate": "/voucher/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/order",
+      "DownstreamPathTemplate": "/api/voucher/{everything}",
       "DownstreamHostAndPorts": [
         {
-          "Host": "orderser.api",
-          "Port": 9001
+          "Host": "voucherservice.api",
+          "Port": 7400
         }
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
-      },
-      "FileCacheOptions": {
-        "TtlSeconds": 60,
-        "Region": "OrderCache"
+      }
+    },
+    {
+      "SwaggerKey": "voucher-service",
+      "UpstreamPathTemplate": "/voucher",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/voucher",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "voucherservice.api",
+          "Port": 7400
+      }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
       }
     }
   ],
@@ -239,12 +274,13 @@
       ]
     },
     {
-      "Key": "order-service",
+
+      "Key": "voucher-service",
       "Config": [
         {
-          "Name": "Order Service",
+          "Name": "Voucher Service",
           "Version": "v1",
-          "Url": "http://orderser.api:9001/swagger/v1/swagger.json"
+          "Url": "http://voucherservice.api:7400/swagger/v1/swagger.json"
         }
       ]
     }

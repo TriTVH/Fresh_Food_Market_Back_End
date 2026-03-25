@@ -37,7 +37,8 @@ public partial class ContentMgmtFfmContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnName("created_date");
             entity.Property(e => e.Image).HasColumnName("image");
             entity.Property(e => e.PublishDate).HasColumnName("publish_date");
-            entity.Property(e => e.StaffId).HasColumnName("staff_id");
+            entity.Property(e => e.SubCategoryId).HasColumnName("sub_category_id");
+            entity.Ignore(e => e.StaffId);
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .IsUnicode(false)
