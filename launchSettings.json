@@ -10,7 +10,8 @@
         "productcatalogservice.api": "StartDebugging",
         "blogservice.api": "StartDebugging",
         "inventoryservice.api": "StartDebugging",
-        "saga.orchestrator": "StartDebugging"
+        "saga.orchestrator": "StartDebugging",
+        "orderser.api": "StartDebugging"
       }
     }
   }

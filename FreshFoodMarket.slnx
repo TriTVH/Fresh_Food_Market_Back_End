@@ -20,6 +20,18 @@
     <Project Path="InventoryService.Repository/InventoryService.Repository.csproj" Id="b1c08921-fa5c-4b98-9596-4c332d7433aa" />
     <Project Path="InventoryService.Service/InventoryService.Service.csproj" Id="5f2ee532-8c68-47c2-a339-1c402bb829e1" />
   </Folder>
+  <Folder Name="/InventoryService_Redis/">
+    <Project Path="InventoryService_Redis.API/InventoryService_Redis.API.csproj" Id="598e4067-5373-493a-9dc4-562aed2fbf5b" />
+  </Folder>
+  <Folder Name="/OrderSer/">
+    <Project Path="OrderSer.API/OrderSer.API.csproj" Id="463200f6-4f9d-4a86-919c-ad91bd523568" />
+    <Project Path="OrderSer.Model/OrderSer.Model.csproj" Id="2a181861-c3c4-4e4b-bccf-e4ceef7d5133" />
+    <Project Path="OrderSer.Repo/OrderSer.Repo.csproj" Id="222dab48-7201-4146-9e82-1b3fd36e4591" />
+    <Project Path="OrderSer.Service/OrderSer.Service.csproj" />
+  </Folder>
+  <Folder Name="/OrderService_Redis/">
+    <Project Path="OrderService.API/OrderService.API.csproj" Id="c28af62a-e0e2-435d-8b16-c6b6d536fd96" />
+  </Folder>
   <Folder Name="/ProductCatalogService/">
     <Project Path="ProductCatalogService.API/ProductCatalogService.API.csproj" Id="808906c4-2451-43ce-b43b-f135a52ba700" />
     <Project Path="ProductCatalogService.Model/ProductCatalogService.Model.csproj" Id="4259e0b5-cebe-4898-9084-87a55815f203" />
@@ -34,6 +46,7 @@
   </Folder>
   <Folder Name="/SharedProject/">
     <Project Path="JwtConfiguration/JwtConfiguration.csproj" />
+    <Project Path="RedisConfiguration/RedisConfiguration.csproj" Id="a6bd9f8e-4543-4587-80b2-286297083ae9" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />

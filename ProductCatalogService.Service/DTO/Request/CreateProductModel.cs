@@ -21,6 +21,10 @@ namespace ProductCatalogService.Service.DTO.Request
         public string? Description { get; set; }
 
         [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Product quantity must be positive number")]
+        public int ProductQty { get; set; }
+
+        [Required]
         [MaxLength(255, ErrorMessage = "Manufacturing Location cannot exceed 255 characters")]
         public string? ManufacturingLocation { get; set; }
 
