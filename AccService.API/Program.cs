@@ -27,6 +27,8 @@ builder.Services.AddDbContext<AccountMgmtFfmContext>(options =>
 );
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 

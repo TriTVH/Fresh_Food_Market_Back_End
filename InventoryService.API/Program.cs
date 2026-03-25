@@ -3,6 +3,7 @@ using InventoryService.Repository;
 using InventoryService.Repository.Implementors;
 using InventoryService.Service;
 using InventoryService.Service.Implementors;
+using InventoryService.Service.Saga.Orchestator;
 using JwtConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -36,8 +37,11 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddScoped<BatchSagaService>();
+
 builder.Services.AddScoped<ISupplierRepo, SupplierRepo>();
 builder.Services.AddScoped<IBatchRepo, BatchRepo>();
+builder.Services.AddScoped<IBatchDetailRepo, BatchDetailRepo>();
 
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IBatchService, BatchService>();

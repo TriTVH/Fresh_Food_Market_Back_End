@@ -10,10 +10,11 @@ namespace AccService.Service.DTO.ResponseObject
     {
         public string Token { get; set; }
         public DateTime ExpirationTime { get; set; }
-        public AuthenticationToken(string token, DateTime expirationTime)
-        {
-            Token = token;
-            ExpirationTime = expirationTime;
-        }
+        public string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiredAt { get; set; }
+       
+        public int Role { get; set; }
+
+        public string Username { get; set; }
     }
 }

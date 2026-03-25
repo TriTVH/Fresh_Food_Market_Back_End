@@ -58,11 +58,23 @@ services:
     networks:
       - ffm-network
     restart: always
+
+  voucherservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7400
+    ports:
+      - "7400:7400"
+    networks:
+      - ffm-network
+    restart: always
  
+
 networks:
   ffm-network:
      driver: bridge
      
+
 
 
 

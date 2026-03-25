@@ -66,6 +66,23 @@
         "AuthenticationProviderKey": "Bearer"
       }
     },
+
+    {
+      "SwaggerKey": "product-catalog-service",
+      "UpstreamPathTemplate": "/product/{everything}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/product/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productcatalogservice.api",
+          "Port": 7000
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
     {
       "SwaggerKey": "product-catalog-service",
       "UpstreamPathTemplate": "/sub-category/{everything}",
@@ -182,6 +199,7 @@
       }
     },
     {
+
       "SwaggerKey": "inventory-service",
       "UpstreamPathTemplate": "/supplier",
       "UpstreamHttpMethod": [ "POST" ],
@@ -193,10 +211,41 @@
           "Port": 7300
         }
       ]
+
+
+      "SwaggerKey": "voucher-service",
+      "UpstreamPathTemplate": "/voucher/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/voucher/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "voucherservice.api",
+          "Port": 7400
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "voucher-service",
+      "UpstreamPathTemplate": "/voucher",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/voucher",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "voucherservice.api",
+          "Port": 7400
+      }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     }
   ],
   "SwaggerEndPoints": [
-
     {
       "Key": "acc-service",
       "Config": [
@@ -234,6 +283,17 @@
           "Name": "Inventory Service",
           "Version": "v1",
           "Url": "http://inventoryservice.api:7300/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+
+      "Key": "voucher-service",
+      "Config": [
+        {
+          "Name": "Voucher Service",
+          "Version": "v1",
+          "Url": "http://voucherservice.api:7400/swagger/v1/swagger.json"
         }
       ]
     }

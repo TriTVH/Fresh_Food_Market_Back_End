@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 
 namespace AccService.Model.DBContext;
 
@@ -22,7 +22,6 @@ public partial class AccountMgmtFfmContext : DbContext
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=tcp:ffmser.database.windows.net,1433;Initial Catalog=account_mgmt_ffm;Persist Security Info=False;User ID=ffm_admin;Password=Server@1235;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
@@ -74,18 +73,15 @@ public partial class AccountMgmtFfmContext : DbContext
             entity.ToTable("address");
 
             entity.Property(e => e.AddressId).HasColumnName("address_id");
-            entity.Property(e => e.CityId).HasColumnName("city_id");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
-            entity.Property(e => e.DistrictId).HasColumnName("district_id");
             entity.Property(e => e.IsDefault).HasColumnName("is_default");
             entity.Property(e => e.Phone)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("phone");
-            entity.Property(e => e.ProvinceId).HasColumnName("province_id");
             entity.Property(e => e.RecipientName)
                 .HasMaxLength(254)
                 .HasColumnName("recipient_name");
@@ -95,7 +91,6 @@ public partial class AccountMgmtFfmContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("datetime")
                 .HasColumnName("updated_at");
-            entity.Property(e => e.WardId).HasColumnName("ward_id");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.CustomerId)
