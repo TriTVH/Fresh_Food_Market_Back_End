@@ -1,9 +1,12 @@
 ﻿using InventoryService.Repository;
 using InventoryService.Service.DTO;
+using InventoryService.Service.DTO.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InventoryService.Service.Implementors
@@ -29,5 +32,9 @@ namespace InventoryService.Service.Implementors
             }).ToList();
             return ApiResponse<List<SupplierDTO>>.Ok(dtos);
         }
+        //public async Task<ApiResponse<SupplierDTO>> CreateSupplierAsync(CreateSupplierModel model)
+        //{
+                
+        //}
     }
 }

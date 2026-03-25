@@ -24,5 +24,11 @@ namespace InventoryService.Repository.Implementors
         {
             return await _context.Suppliers.FirstOrDefaultAsync(s => s.SupplierId == supplierId);
         }
+        public async Task<Supplier> CreateSupplier(Supplier supplier)
+        {
+            _context.Suppliers.Add(supplier);
+            await _context.SaveChangesAsync();
+            return supplier;
+        }
     }
 }

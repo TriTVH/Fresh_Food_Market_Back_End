@@ -46,5 +46,42 @@ namespace AccService.Service.Implementor
                 return ApiResponse<List<AccountDTO>>.Error(null, ex.Message, 500);
             }
         }
+
+        public async Task<ApiResponse<object>> CreateSupplierAccountAsync(CreateSupplierAccountRequest request)
+        {
+            if (await _accountRepository.CheckPhoneExistsAsync(request.Phone))
+            {
+                return new ApiResponse<object>(false, "Phone number already exists in the system.", null, 409);
+            }
+
+            if (await _accountRepository.CheckUsernameExistsAsync(request.Username))
+            {
+                return new ApiResponse<object>(false, "Username already exists.", null, 409);
+            }
+
+            var newAccount = new Account
+            {
+                Username = request.Username,
+                Phone = request.Phone,
+                Email = request.Email,
+                Password = request.Password, 
+                RoleId = 3,
+                SupplierId = request.SupplierId,
+                IsActive = true,
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow
+            };
+
+            var createdAccount = await _accountRepository.CreateAccountAsync(newAccount);
+
+            var responseData = new
+            {
+                createdAccount.AccountId,
+                createdAccount.Username,
+                createdAccount.Phone
+            };
+
+            return new ApiResponse<object>(true, "Supplier account created successfully.", responseData, 201);
+        }
     }
 }

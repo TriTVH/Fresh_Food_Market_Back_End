@@ -200,6 +200,19 @@
     },
     {
 
+      "SwaggerKey": "inventory-service",
+      "UpstreamPathTemplate": "/supplier",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/supplier",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice.api",
+          "Port": 7300
+        }
+      ]
+
+
       "SwaggerKey": "voucher-service",
       "UpstreamPathTemplate": "/voucher/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
