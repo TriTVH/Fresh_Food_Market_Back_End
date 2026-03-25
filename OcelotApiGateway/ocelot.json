@@ -212,10 +212,41 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "order-service",
+      "UpstreamPathTemplate": "/order/{everything}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/order/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "order-service",
+      "UpstreamPathTemplate": "/order",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/order",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     }
   ],
   "SwaggerEndPoints": [
-
     {
       "Key": "acc-service",
       "Config": [
@@ -263,6 +294,16 @@
           "Name": "Voucher Service",
           "Version": "v1",
           "Url": "http://voucherservice.api:7400/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "order-service",
+      "Config": [
+        {
+          "Name": "Order Service",
+          "Version": "v1",
+          "Url": "http://orderservice.api:7500/swagger/v1/swagger.json"
         }
       ]
     }
