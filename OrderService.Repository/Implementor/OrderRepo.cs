@@ -13,6 +13,14 @@ namespace OrderService.Repository.Implementor
             _context = context;
         }
 
+        public async Task<List<Order>> GetAllAsync()
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
+
         public async Task<Order> CreateAsync(Order order)
         {
             _context.Orders.Add(order);

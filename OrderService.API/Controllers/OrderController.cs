@@ -1,10 +1,15 @@
+using JwtConfiguration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OrderService.Service;
-using OrderService.Service.DTO;
 using OrderService.Service.DTO.Request;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace OrderService.API.Controllers
 {
+    [ApiController]
     [Route("api/order")]
     public class OrderController : ControllerBase
     {
@@ -16,19 +21,36 @@ namespace OrderService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderModel request)
+        public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
         {
-            if (!ModelState.IsValid)
-            {
-                var firstError = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .FirstOrDefault()?.ErrorMessage;
-
-                return BadRequest(ApiResponse<object>.Error(null, firstError, 400));
-            }
-
             var response = await _orderService.CreateOrderAsync(request);
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var response = await _orderService.GetAllOrdersAsync();
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var response = await _orderService.GetOrderByIdAsync(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> Cancel(int id, [FromBody] CancelOrderRequest request)
+        {
+            var response = await _orderService.CancelOrderAsync(id, request.CancelReason);
+            return StatusCode(response.StatusCode, response);
+        }
+    }
+
+    public class CancelOrderRequest
+    {
+        public string? CancelReason { get; set; }
     }
 }
