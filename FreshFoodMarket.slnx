@@ -26,7 +26,7 @@
     <Project Path="OrderService.Model/OrderService.Model.csproj" Id="a911e6f2-bebf-4221-8e8a-116fb8842e99" />
     <Project Path="OrderService.Repository/OrderService.Repository.csproj" Id="88403ede-0b49-4ef7-b1de-8419b4ef5d0f" />
     <Project Path="OrderService.Service/OrderService.Service.csproj" Id="307cfc3f-ea45-48da-9f4d-c781c1f709e9" />
-
+  </Folder>
   <Folder Name="/InventoryService_Redis/">
     <Project Path="InventoryService_Redis.API/InventoryService_Redis.API.csproj" Id="598e4067-5373-493a-9dc4-562aed2fbf5b" />
   </Folder>

@@ -301,7 +301,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "orderservice.api",
-          "Port": 7500
+          "Port": 7700
         }
       ],
       "AuthenticationOptions": {
@@ -317,7 +317,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "orderservice.api",
-          "Port": 7500
+          "Port": 7700
         }
       ],
       "AuthenticationOptions": {
@@ -384,7 +384,7 @@
         {
           "Name": "Order Service",
           "Version": "v1",
-          "Url": "http://orderservice.api:7500/swagger/v1/swagger.json"
+          "Url": "http://orderservice.api:7700/swagger/v1/swagger.json"
         }
       ]
     },

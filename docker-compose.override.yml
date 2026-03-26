@@ -96,9 +96,9 @@ services:
   orderservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=7500
+      - ASPNETCORE_HTTP_PORTS=7700
     ports:
-      - "7500:7500"
+      - "7700:7700"
     networks:
       - ffm-network
     restart: always
