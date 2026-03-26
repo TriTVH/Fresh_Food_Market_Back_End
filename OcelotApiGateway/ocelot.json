@@ -211,8 +211,8 @@
           "Port": 7300
         }
       ]
-
-
+    },
+    {
       "SwaggerKey": "voucher-service",
       "UpstreamPathTemplate": "/voucher/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
@@ -223,22 +223,6 @@
           "Host": "voucherservice.api",
           "Port": 7400
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "SwaggerKey": "voucher-service",
-      "UpstreamPathTemplate": "/voucher",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/voucher",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "voucherservice.api",
-          "Port": 7400
-      }
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"

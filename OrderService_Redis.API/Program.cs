@@ -107,7 +107,7 @@ app.MapPost("/orders/{orderId}/move-to-packaging", async (
         });
     }
 
-    order.OrderStatus = "RESERVING_INVENTORY";
+    
 
     var saga = sagaStore.CreateFromOrder(order);
 

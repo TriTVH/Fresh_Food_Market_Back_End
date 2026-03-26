@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace OrderService_Redis.API
 {
-    public sealed class SagaStore
+    public class SagaStore
     {
         private readonly ConcurrentDictionary<string, SagaRecord> _sagas = new();
         private readonly ConcurrentDictionary<string, byte> _processedMessages = new();
@@ -18,7 +18,7 @@ namespace OrderService_Redis.API
                 CurrentStep = "RESERVE_INVENTORY",
                 CreatedAtUtc = DateTime.UtcNow
             };
-
+            order.OrderStatus = "RESERVING_INVENTORY";
             _sagas[saga.SagaId] = saga;
             return saga;
         }
