@@ -68,6 +68,7 @@ services:
     networks:
       - ffm-network
     restart: always
+
   orderservice.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -81,3 +82,5 @@ services:
 networks:
   ffm-network:
     driver: bridge
+
+ 

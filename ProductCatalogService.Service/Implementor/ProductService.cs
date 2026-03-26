@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using ProductCatalogService.Model;
 using ProductCatalogService.Model.DBContext;
 using ProductCatalogService.Repository;
@@ -56,14 +57,16 @@ namespace ProductCatalogService.Service.Implementor
                     }
                 }
 
+                var finalProductName = $"{request.ProductName} ({request.Weight} {request.Unit})";
+
                 var product = new Product
                 {
                     SubCategoryId = request.SubCategoryId,
-                    ProductName = request.ProductName,
+                    ProductName = finalProductName,
                     Description = request.Description,
                     ManufacturingLocation = request.ManufacturingLocation,
                     PriceSell = request.PriceSell,
-                    Quantity = 0,
+                    Quantity = request.ProductQty,
                     Weight = request.Weight,
                     Unit = request.Unit,
                     IsOrganic = request.IsOrganic,
@@ -74,6 +77,8 @@ namespace ProductCatalogService.Service.Implementor
                     UpdatedAt = DateTime.UtcNow
                 };
                 var created = await _productRepo.CreateAsync(product);
+                await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
+
                 return ApiResponse<ProductDTO>.Ok(null, "Product created successfully", 201);
             }
             catch (Exception ex)
@@ -81,6 +86,62 @@ namespace ProductCatalogService.Service.Implementor
                 return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
             }
         }
+
+        public async Task<ApiResponse<List<ProductDTO>>> GetActiveProducts()
+        {
+            try
+            {
+                var productsFromRedis = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+
+                if (productsFromRedis != null && productsFromRedis.Any())
+                {
+                    var activeProductsFromRedis = productsFromRedis
+                        .Where(p => p.IsAvailable)
+                        .ToList();
+
+                    return ApiResponse<List<ProductDTO>>.Ok(activeProductsFromRedis);
+                }
+
+                var products = await _productRepo.GetAllProducts();
+
+                var productDTOs = products.Select(p => new ProductDTO
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    SubCategoryId = p.SubCategoryId,
+                    SubCategoryName = p.SubCategory.SubCategoryName,
+                    CategoryName = p.SubCategory.Category.CategoryName,
+                    Description = p.Description,
+                    PriceSell = p.PriceSell,
+                    ManufacturingLocation = p.ManufacturingLocation,
+                    Quantity = p.Quantity,
+                    Weight = p.Weight,
+                    Unit = p.Unit,
+                    IsOrganic = p.IsOrganic,
+                    Certification = p.Certification,
+                    IsAvailable = p.IsAvailable,
+                    ImagesJson = p.ImagesJson,
+                    RatingCount = p.RatingCount,
+                    RatingAverage = p.RatingAverage,
+                    SoldCount = p.SoldCount,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt
+                }).ToList();
+
+                await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
+
+                var activeProducts = productDTOs
+                    .Where(p => p.IsAvailable)
+                    .ToList();
+
+                return ApiResponse<List<ProductDTO>>.Ok(activeProducts);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<ProductDTO>>.Error(null, ex.Message, 500);
+            }
+        }
+
         public async Task<ApiResponse<List<ProductDTO>>> GetAllProducts()
         {
             try
@@ -97,11 +158,13 @@ namespace ProductCatalogService.Service.Implementor
                 {
                     ProductId = p.ProductId,
                     ProductName = p.ProductName,
+                    SubCategoryId = p.SubCategoryId,
                     SubCategoryName = p.SubCategory.SubCategoryName,
                     CategoryName = p.SubCategory.Category.CategoryName,
                     Description = p.Description,
                     PriceSell = p.PriceSell,
                     Quantity = p.Quantity,
+                    ManufacturingLocation = p.ManufacturingLocation,
                     Weight = p.Weight,
                     Unit = p.Unit,
                     IsOrganic = p.IsOrganic,
@@ -115,7 +178,7 @@ namespace ProductCatalogService.Service.Implementor
                     UpdatedAt = p.UpdatedAt
                 }).ToList();
                 await _productRedisCacheService.SetAllProductsToRedisAsync(productDTOs);
-                return ApiResponse<List<ProductDTO>>.Ok(null);
+                return ApiResponse<List<ProductDTO>>.Ok(productDTOs);
             }
             catch (Exception ex)
             {
@@ -136,6 +199,7 @@ namespace ProductCatalogService.Service.Implementor
                 {
                     ProductId = product.ProductId,
                     ProductName = product.ProductName,
+                    SubCategoryId = product.SubCategoryId,
                     SubCategoryName = product.SubCategory.SubCategoryName,
                     CategoryName = product.SubCategory.Category.CategoryName,
                     Description = product.Description,
@@ -146,6 +210,7 @@ namespace ProductCatalogService.Service.Implementor
                     IsOrganic = product.IsOrganic,
                     Certification = product.Certification,
                     IsAvailable = product.IsAvailable,
+                    ManufacturingLocation = product.ManufacturingLocation,
                     ImagesJson = product.ImagesJson,
                     RatingCount = product.RatingCount,
                     RatingAverage = product.RatingAverage,
@@ -160,94 +225,127 @@ namespace ProductCatalogService.Service.Implementor
                 return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
             }
         }
-        public async Task<ApiResponse<ProductDTO>> UpdateProduct(UpdateProductModel request)
+   
+        public async Task<ApiResponse<ProductDTO>> UpdateProductAsync(UpdateProductModel request)
         {
-            var existingProduct = await _productRepo.GetProductByIdAsync(request.ProductId);
-            if (existingProduct == null)
+            try
             {
-                return ApiResponse<ProductDTO>.Error(null, "Không tìm thấy sản phẩm để cập nhật", 404);
+                var product = await _productRepo.GetProductByIdAsync(request.ProductId);
+                if (product == null)
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "Product not found", 404);
+                }
+
+                var subCategory = await _subCategoryRepo.GetSubCategoryById(request.SubCategoryId);
+                if (subCategory == null)
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "Sub Category not found", 404);
+                }
+
+                if (request.ImagesJson == null || !request.ImagesJson.Any())
+                {
+                    return ApiResponse<ProductDTO>.Error(null, "At least one image is required", 400);
+                }
+
+                if (request.ImagesJson.Count == 1)
+                {
+                    request.ImagesJson[0].Primary = true;
+                }
+                else
+                {
+                    var primaryImages = request.ImagesJson.Where(x => x.Primary).ToList();
+
+                    if (primaryImages.Count == 0)
+                    {
+                        request.ImagesJson[0].Primary = true;
+                    }
+                    else if (primaryImages.Count > 1)
+                    {
+                        return ApiResponse<ProductDTO>.Error(null, "Only one image can be set as primary", 400);
+                    }
+                }
+
+
+                product.SubCategoryId = request.SubCategoryId;
+                product.ProductName = request.ProductName;
+                product.Description = request.Description;
+                product.ManufacturingLocation = request.ManufacturingLocation;
+                product.PriceSell = request.PriceSell;
+                product.Quantity = request.ProductQty;
+                product.Weight = request.Weight;
+                product.Unit = request.Unit;
+                product.IsOrganic = request.IsOrganic;
+                product.Certification = request.Certification;
+                product.ImagesJson = request.ImagesJson;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                var updated = await _productRepo.UpdateAsync(product);
+                await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
+
+                var result = new ProductDTO
+                {
+                    ProductId = updated.ProductId,
+                    ProductName = updated.ProductName,
+                    SubCategoryId = updated.SubCategoryId,
+                    Description = updated.Description,
+                    ManufacturingLocation = updated.ManufacturingLocation,
+                    PriceSell = updated.PriceSell,
+                    Quantity = updated.Quantity,
+                    Weight = updated.Weight,
+                    Unit = updated.Unit,
+                    IsOrganic = updated.IsOrganic,
+                    Certification = updated.Certification,
+                    IsAvailable = updated.IsAvailable,
+                    ImagesJson = updated.ImagesJson
+                };
+
+                return ApiResponse<ProductDTO>.Ok(result, "Product updated successfully", 200);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<ProductDTO>.Error(null, ex.Message, 500);
+            }
+        }
+
+        public async Task<ApiResponse<ProductDTO>> UpdateProductQtyAsync(UpdateProductQtyRequest request)
+        {
+
+            var product = await _productRepo.GetProductByIdAsync(request.ProductId);
+
+            if (product == null)
+            {
+                return ApiResponse <ProductDTO>.Error(null, "Product not found or be deleted");
             }
 
-            existingProduct.SubCategoryId = request.SubCategoryId;
-            existingProduct.ProductName = request.ProductName;
-            existingProduct.Description = request.Description;
-            existingProduct.ManufacturingLocation = request.ManufacturingLocation;
-            existingProduct.PriceSell = request.PriceSell;
-            existingProduct.Weight = request.Weight;
-            existingProduct.Unit = request.Unit;
-            existingProduct.IsOrganic = request.IsOrganic;
-            existingProduct.Certification = request.Certification;
-            existingProduct.ImagesJson = request.ImagesJson;
-            existingProduct.IsAvailable = request.IsAvailable ?? existingProduct.IsAvailable;
-            existingProduct.UpdatedAt = DateTime.UtcNow;
-
-            await _productRepo.UpdateAsync(existingProduct);
-
-            var productDto = MapToDTO(existingProduct);
-
-            await _productRedisCacheService.SetProductToRedisAsync(productDto);
-
-            return ApiResponse<ProductDTO>.Ok(productDto, "Cập nhật thành công", 200);
-        }
-
-        public async Task<ApiResponse<bool>> DeleteProduct(int productId)
-        {
-            var isDeleted = await _productRepo.DeleteAsync(productId);
-            if (!isDeleted)
+            switch (request.Action)
             {
-                return ApiResponse<bool>.Error(false, "Sản phẩm không tồn tại hoặc đã bị xóa", 404);
+                case UpdateQtyAction.Add:
+                    product.Quantity += request.ProductQty;
+                    break;
+
+                default:
+                    return ApiResponse<ProductDTO>.Error(null, "Invalid Action");
             }
 
-            await _productRedisCacheService.RemoveProductFromRedisAsync(productId);
+            product.UpdatedAt = DateTime.UtcNow;
 
-            return ApiResponse<bool>.Ok(true, "Xóa sản phẩm thành công", 200);
-        }
-        private ProductDTO MapToDTO(Product p)
-        {
-            return new ProductDTO
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                SubCategoryName = p.SubCategory?.SubCategoryName,
-                CategoryName = p.SubCategory?.Category?.CategoryName,
-                Description = p.Description,
-                PriceSell = p.PriceSell,
-                Quantity = p.Quantity,
-                Weight = p.Weight,
-                Unit = p.Unit,
-                IsOrganic = p.IsOrganic,
-                Certification = p.Certification,
-                IsAvailable = p.IsAvailable,
-                ImagesJson = p.ImagesJson,
-                RatingCount = p.RatingCount,
-                RatingAverage = p.RatingAverage,
-                SoldCount = p.SoldCount,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            };
-        }
-        public async Task<ApiResponse<List<ProductDTO>>> GetAllProducts(string? search = null)
-        {
-            var cachedProducts = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+            await _productRepo.UpdateAsync(product);
 
-            if (cachedProducts == null || !cachedProducts.Any())
+            var products = await _productRedisCacheService.GetAllProductsFromRedisAsync();
+
+            if (products == null || !products.Any())
             {
                 await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
-                cachedProducts = await _productRedisCacheService.GetAllProductsFromRedisAsync();
             }
-
-            var result = cachedProducts.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(search))
+            else
             {
-                var keyword = search.Trim().ToLower();
-                result = result.Where(p =>
-                    (p.ProductName != null && p.ProductName.ToLower().Contains(keyword)) ||
-                    (p.ProductId.ToString().Contains(keyword)) 
-                );
+                var productInRedis = products.FirstOrDefault(p => p.ProductId == request.ProductId);
+                productInRedis.Quantity = product.Quantity;
+                await _productRedisCacheService.SetAllProductsToRedisAsync(products);
             }
 
-            return ApiResponse<List<ProductDTO>>.Ok(result.ToList(), "Lấy dữ liệu thành công", 200);
+            return ApiResponse<ProductDTO>.Ok(null, "Product quantity updated successfully");
+
         }
     }
 }

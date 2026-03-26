@@ -27,6 +27,34 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById([FromRoute] int id)
+        {
+            var response = await _productService.GetProductByIdAsync(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveProducts()
+        {
+            var response = await _productService.GetActiveProducts();
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] Service.DTO.Request.CreateProductModel request)
         {
@@ -48,6 +76,7 @@ namespace ProductCatalogService.API.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductModel request)
         {
@@ -55,6 +84,7 @@ namespace ProductCatalogService.API.Controllers
             {
                 return BadRequest(ApiResponse<object>.Error(null, "ID trên route và trong body không khớp", 400));
             }
+
 
             if (!ModelState.IsValid)
             {
@@ -64,28 +94,44 @@ namespace ProductCatalogService.API.Controllers
 
                 return BadRequest(ApiResponse<object>.Error(null, firstError, 400));
             }
-
-            var response = await _productService.UpdateProduct(request);
-            return response.Success ? Ok(response) : StatusCode(response.StatusCode, response);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            var response = await _productService.DeleteProduct(id);
-            return response.Success ? Ok(response) : StatusCode(response.StatusCode, response);
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> GetListProducts([FromQuery] string? search)
-        {
-            var response = await _productService.GetAllProducts(search);
-
+            var response = await _productService.UpdateProductAsync(request);
             if (response.Success)
             {
-                return Ok(response);
+                return StatusCode(response.StatusCode, response);
             }
-            return StatusCode(response.StatusCode, response);
+            else
+            {
+                return StatusCode(response.StatusCode, response);
+            }
         }
+
+        [HttpPut("quantity")]
+        public async Task<IActionResult> UpdateProductQty([FromBody] UpdateProductQtyRequest request)
+        {
+            
+            var response = await _productService.UpdateProductQtyAsync(request);
+     
+                return StatusCode(response.StatusCode, response);
+            
+        }
+
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteProduct(int id)
+        //{
+        //    var response = await _productService.DeleteProduct(id);
+        //    return response.Success ? Ok(response) : StatusCode(response.StatusCode, response);
+        //}
+
+        //[HttpGet("search")]
+        //public async Task<IActionResult> GetListProducts([FromQuery] string? search)
+        //{
+        //    var response = await _productService.GetAllProducts(search);
+
+        //    if (response.Success)
+        //    {
+        //        return Ok(response);
+        //    }
+        //    return StatusCode(response.StatusCode, response);
+        //}
     }
 }

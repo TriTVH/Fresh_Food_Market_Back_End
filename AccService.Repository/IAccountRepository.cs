@@ -13,5 +13,8 @@ namespace AccService.Repository
         Task<Account?> CreateAccountAsync(Account account);
         Task<bool> IsUsernameExistsAsync(string username);
         Task<Account?> IsValidUserCredential(string phone, string password);
+
+        Task<bool> CheckPhoneExistsAsync(string phone);
+        Task<bool> CheckUsernameExistsAsync(string username);
     }
 }

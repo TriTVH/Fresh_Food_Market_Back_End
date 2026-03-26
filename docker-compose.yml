@@ -29,6 +29,7 @@ services:
       context: .
       dockerfile: InventoryService.API/Dockerfile
 
+
   voucherservice.api:
     image: ffm-voucherserviceapi
     build:
@@ -43,5 +44,6 @@ services:
 
 volumes:
    rabbitmq_data:
+
 
 

@@ -1,17 +1,12 @@
-﻿using AccService.Model;
-using AccService.Service.DTO;
+﻿using AccService.Service.DTO;
 using AccService.Service.DTO.RequestObject;
 using AccService.Service.DTO.ResponseObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccService.Service
 {
     public interface IAccountService
     {
         Task<ApiResponse<List<AccountDTO>>> GetAccounts();
+        Task<ApiResponse<object>> CreateSupplierAccountAsync(CreateSupplierAccountRequest request);
     }
 }

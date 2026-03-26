@@ -11,6 +11,7 @@ namespace ProductCatalogService.Service.DTO.Response
     {
         public int ProductId { get; set; }
 
+        public int SubCategoryId { get; set; }
         public string SubCategoryName { get; set; }
 
         public string CategoryName { get; set; }
@@ -33,7 +34,7 @@ namespace ProductCatalogService.Service.DTO.Response
 
         public string? Certification { get; set; }
 
-        public bool? IsAvailable { get; set; }
+        public bool IsAvailable { get; set; }
 
         public int? SoldCount { get; set; }
 

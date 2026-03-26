@@ -23,7 +23,7 @@ namespace ProductCatalogService.Repository.Implementor
         public async Task<Product> CreateAsync(Product product)
         {
             var entry = await _context.Products.AddAsync(product);
-            
+            await _context.SaveChangesAsync();
             return entry.Entity;
         }
 

@@ -3,6 +3,8 @@ using InventoryService.Repository;
 using InventoryService.Service.DTO;
 using InventoryService.Service.DTO.Request;
 using InventoryService.Service.DTO.Response;
+using InventoryService.Service.Saga.Orchestator;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -18,15 +20,18 @@ namespace InventoryService.Service.Implementors
     {
         IBatchRepo _repo;
         ISupplierRepo _supplierRepo;
+        private readonly BatchSagaService _batchSagaService;
         private readonly IConnectionMultiplexer _redis;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public BatchService(ISupplierRepo supplierRepo,IBatchRepo repo, IConnectionMultiplexer redis, IHttpClientFactory httpClientFactory)
+
+        public BatchService(ISupplierRepo supplierRepo,IBatchRepo repo, IConnectionMultiplexer redis, IHttpClientFactory httpClientFactory, BatchSagaService batchSagaService   )
         {
             _repo = repo;
             _supplierRepo = supplierRepo;
             _redis = redis;
             _httpClientFactory = httpClientFactory;
+            _batchSagaService = batchSagaService;
         }
 
         public async Task<ApiResponse<BatchDTO>> AddBatchAsync(CreateBatchModel request)
@@ -107,10 +112,8 @@ namespace InventoryService.Service.Implementors
                     SupplyBy = b.CreatedBy,
                     BatchCode = b.BatchCode,
                     TotalItems = b.TotalItems,
-                    TotalPrice = b.TotalPrice,
                     Status = b.Status,
                     DeliveredDate = b.DeliveredDate,
-                    ImageConfirmReceived = b.ImageConfirmReceived,
                     CreatedDate = b.CreatedDate,
                     UpdatedDate = b.UpdatedDate,
                    
@@ -141,20 +144,19 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                 SupplyBy = batch.CreatedBy,
                 BatchCode = batch.BatchCode,
                 TotalItems = batch.TotalItems,
-                TotalPrice = batch.TotalPrice,
                 Status = batch.Status,
                 DeliveredDate = batch.DeliveredDate,
-                ImageConfirmReceived = batch.ImageConfirmReceived,
+                ImageConfirmReceived = DesializeImageItem(batch.ImageConfirmReceived),
                 Notes = DeserializeBatchNote(batch.Notes),
                 CreatedDate = batch.CreatedDate,
                 UpdatedDate = batch.UpdatedDate,
-                BatchDetails = batch.BatchDetails.Select(d => new BatchDeatailDTO
+               
+                BatchDetails = batch.BatchDetails.Select(d => new BatchDetailDTO
                 {
                     BatchDetailId = d.BatchDetailId,
                     ProductId = d.ProductId,
                     ProductName = d.ProductName,
                     Quantity = d.Quantity,
-                    Price = d.Subtotal,
                     ExpiredDate = d.ExpiredDate
                 }).ToList()
             };
@@ -198,6 +200,7 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     403
                 );
             }
+            var requestItemMap = request.Items.ToDictionary(x => x.Id, x => x);
 
             switch (request.Action)
             {
@@ -224,7 +227,6 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     var insufficientSupplyNote = new List<MissingSupplyNote>();
                     var unprovidedProducts = new List<MissingSupplyNote>();
 
-                    var requestItemMap = request.Items.ToDictionary(x => x.Id, x => x);
 
                     foreach (var detail in batch.BatchDetails)
                     {
@@ -253,6 +255,15 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                         var requiredQuantity = detail.Quantity;
                         var providedQuantity = item.Quantity;
 
+                        if (providedQuantity > requiredQuantity)
+                        {
+                            return ApiResponse<BatchDTO>.Error(
+                                null,
+                                $"Provided quantity for BatchDetailId {item.Id} cannot exceed required quantity of {requiredQuantity}.",
+                                400
+                            );
+                        }
+
                         if (providedQuantity < requiredQuantity)
                         {
                             if (providedQuantity == 0)
@@ -266,24 +277,24 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                                     Provided = providedQuantity,
                                     Missing = requiredQuantity - providedQuantity
                                 });
+                                detail.Quantity = providedQuantity;
+                                detail.ExpiredDate = item.ExpiredDate;
                                 continue;
                             }
-                            else
+
+                            insufficientSupplyNote.Add(new MissingSupplyNote
                             {
-                                insufficientSupplyNote.Add(new MissingSupplyNote
-                                {
-                                    BatchDetailId = detail.BatchDetailId,
-                                    ProductId = detail.ProductId,
-                                    ProductName = detail.ProductName ?? string.Empty,
-                                    Required = requiredQuantity,
-                                    Provided = providedQuantity,
-                                    Missing = requiredQuantity - providedQuantity
-                                });
-                            }  
+                                BatchDetailId = detail.BatchDetailId,
+                                ProductId = detail.ProductId,
+                                ProductName = detail.ProductName ?? string.Empty,
+                                Required = requiredQuantity,
+                                Provided = providedQuantity,
+                                Missing = requiredQuantity - providedQuantity
+                            });
                         }
+
                         detail.Quantity = providedQuantity;
                         detail.ExpiredDate = item.ExpiredDate;
-                        detail.Subtotal = item.Price;
                     }
 
                     note.InsufficientSupplyNote = insufficientSupplyNote;
@@ -295,9 +306,117 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     batch.Status = "PACKAGING";
                     batch.UpdatedDate = DateTime.UtcNow;
                     break;
+                case BatchAction.Delivery:
+                    if (batch.Status != "PACKAGING")
+                    {
+                        return ApiResponse<BatchDTO>.Error(
+                            null,
+                            $"Cannot confirm batch because current status is {batch.Status}. Only PENDING batch can be confirmed.",
+                            400
+                        );
+                    }
+                    batch.Status = "DELIVERING";
+                    batch.UpdatedDate = DateTime.UtcNow;
+                    break;
+                case BatchAction.Complete:
+                    if (batch.Status != "DELIVERING")
+                    {
+                        return ApiResponse<BatchDTO>.Error(
+                            null,
+                            $"Cannot complete batch because current status is {batch.Status}. Only PENDING batch can be confirmed.",
+                            400
+                        );
+                    }
+                    if (!batch.BatchDetails.Any())
+                    {
+                        return ApiResponse<BatchDTO>.Error(
+                            null,
+                            "Cannot complete batch because batch has no details.",
+                            400
+                        );
+                    }
+                    note = DeserializeBatchNote(batch.Notes);
 
+                    var completedStats = new List<CompletedSupplyStat>();
+
+                    foreach (var detail in batch.BatchDetails)
+                    {
+                        var required = detail.Quantity;
+
+                        if (!requestItemMap.TryGetValue(detail.BatchDetailId, out var item))
+                        {
+                            completedStats.Add(new CompletedSupplyStat
+                            {
+                                BatchDetailId = detail.BatchDetailId,
+                                ProductId = detail.ProductId,
+                                ProductName = detail.ProductName,
+                                Required = required,
+                                Provided = 0,
+                                Missing = required,
+                                Extra = 0,
+                                Status = "INSUFFICIENT"
+                            });
+                            continue;
+
+                        }
+
+                        var provided = item.Quantity;
+
+                        var missing = required > provided ? required - provided : 0;
+                        var extra = provided > required ? provided - required : 0;
+
+                        completedStats.Add(new CompletedSupplyStat
+                        {
+                            BatchDetailId = detail.BatchDetailId,
+                            ProductId = detail.ProductId,
+                            ProductName = detail.ProductName,
+                            Required = required,
+                            Provided = provided,
+                            Missing = missing,
+                            Extra = extra,
+                            Status = missing > 0 ? "INSUFFICIENT" : (extra > 0 ? "EXTRA" : "SUFFICIENT")
+                        });
+                    }
+                    var sagaResult = await _batchSagaService.ProcessBatch(request.Items);
+
+                    if (!sagaResult.IsNullOrEmpty())
+                    {
+                        if(sagaResult.Contains("Product not found or be deleted") || sagaResult.Contains("Batch Detail not found"))
+                        {
+                            note = DeserializeBatchNote(batch.Notes);
+                            note.CancelInfo = new CancelInfoNote
+                            {
+                                CancelledAt = DateTime.UtcNow,
+                                Reason = sagaResult + ". Batch cancelled due to data inconsistency. Please review the batch details and product information, then create a new batch if needed."
+                            };
+
+                            batch.Notes = SerializeBatchNote(note);
+                            batch.Status = "CANCELED";
+                            batch.UpdatedDate = DateTime.UtcNow;
+                            
+                            await _repo.UpdateBatchAsync(batch);
+
+                                return ApiResponse<BatchDTO>.Error(
+                                    null,
+                                    sagaResult+ ". Batch cancelled due to data inconsistency.",
+                                    409
+                                );
+                        }
+                        return ApiResponse<BatchDTO>.Error(
+                             null,
+                             sagaResult+ ". Please try again later.",
+                             500
+                         );
+                    }
+
+                    note.CompletedSupplyStats = completedStats;
+                    batch.ImageConfirmReceived = SerializeImageItem(request.ImagesJson);
+                    batch.Notes = SerializeBatchNote(note);
+                    batch.Status = "COMPLETED";
+                    batch.UpdatedDate = DateTime.UtcNow;
+                    break;
                 case BatchAction.Cancel:
-                    if (batch.Status == "Complete")
+                    if (batch.Status == "COMPLETED")
                     {
                         return ApiResponse<BatchDTO>.Error(
                             null,
@@ -305,7 +424,11 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                             400
                         );
                     }
+
+
+
                     note = DeserializeBatchNote(batch.Notes);
+                    
                     note.CancelInfo = new CancelInfoNote
                     {
                         CancelledAt = DateTime.UtcNow,
@@ -340,6 +463,30 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
             catch
             {
                 return new BatchNoteModel();
+            }
+        }
+
+        private string SerializeImageItem(List<ImageItem> images)
+        {
+            return JsonSerializer.Serialize(images, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+        }
+
+        private List<ImageItem> DesializeImageItem(string? imagesJson)
+        {
+            if (string.IsNullOrWhiteSpace(imagesJson))
+            {
+                return new List<ImageItem>();
+            }
+            try
+            {
+                return JsonSerializer.Deserialize<List<ImageItem>>(imagesJson) ?? new  List<ImageItem>();
+            }
+            catch
+            {
+                return new List<ImageItem>();
             }
         }
 
