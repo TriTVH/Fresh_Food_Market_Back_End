@@ -211,8 +211,8 @@
           "Port": 7300
         }
       ]
-
-
+    },
+    {
       "SwaggerKey": "voucher-service",
       "UpstreamPathTemplate": "/voucher/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
@@ -229,16 +229,64 @@
       }
     },
     {
-      "SwaggerKey": "voucher-service",
-      "UpstreamPathTemplate": "/voucher",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/orders/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/api/voucher",
+      "DownstreamPathTemplate": "/orders/{everything}",
       "DownstreamHostAndPorts": [
         {
-          "Host": "voucherservice.api",
-          "Port": 7400
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/orders",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/orders",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/sagas",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/sagas",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "inventory-service-redis",
+      "UpstreamPathTemplate": "/inventory/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/inventory/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "inventoryservice_redis.api",
+          "Port": 7600
+        }
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
@@ -330,12 +378,33 @@
       ]
     },
     {
+
       "Key": "order-service",
       "Config": [
         {
           "Name": "Order Service",
           "Version": "v1",
           "Url": "http://orderservice.api:7500/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "order-service-redis",
+      "Config": [
+        {
+          "Name": "Order Service (Redis)",
+          "Version": "v1",
+          "Url": "http://orderservice_redis.api:7500/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "inventory-service-redis",
+      "Config": [
+        {
+          "Name": "Inventory Service (Redis)",
+          "Version": "v1",
+          "Url": "http://inventoryservice_redis.api:7600/swagger/v1/swagger.json"
         }
       ]
     }
