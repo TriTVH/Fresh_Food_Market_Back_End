@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderService.Service.Saga.Orchestator.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace OrderService.Service.Saga.Orchestator
 {
     public interface ISagaStep
     {
-        Task ExecuteAsync();
-        Task CompensateAsync();
+        Task ExecuteAsync(SagaContext sagaContext);
+        Task CompensateAsync(SagaContext sagaContext);
     }
 }
