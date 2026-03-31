@@ -76,7 +76,15 @@ app.MapPost("/orders", (CreateOrderRequest request, OrderStore orderStore) =>
     });
 });
 
-app.MapGet("/orders", (OrderStore orderStore) => Results.Ok(orderStore.GetAll()));
+app.MapGet("/orders", (string? userId, OrderStore orderStore) => 
+{
+    if (!string.IsNullOrEmpty(userId))
+    {
+        return Results.Ok(orderStore.GetByUserId(userId));
+    }
+    return Results.Ok(orderStore.GetAll());
+});
+
 
 app.MapGet("/orders/{orderId}", (string orderId, OrderStore orderStore) =>
 {

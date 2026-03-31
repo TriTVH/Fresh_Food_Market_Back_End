@@ -32,6 +32,10 @@ namespace OrderService_Redis.API
             public IEnumerable<OrderRecord> GetAll()
                 => _orders.Values.OrderByDescending(x => x.CreatedAtUtc);
 
+            public IEnumerable<OrderRecord> GetByUserId(string userId)
+                => _orders.Values.Where(x => x.UserId == userId).OrderByDescending(x => x.CreatedAtUtc);
+
+
             public bool CanMoveToPackaging(OrderRecord order)
             {
                 if (!string.Equals(order.OrderStatus, "PENDING", StringComparison.OrdinalIgnoreCase))
