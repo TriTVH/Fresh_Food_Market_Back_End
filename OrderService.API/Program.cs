@@ -6,6 +6,7 @@ using OrderService.Repository;
 using OrderService.Repository.Implementor;
 using OrderService.Service;
 using OrderService.Service.HttpClients;
+using OrderService.Service.Vnpay;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,11 @@ builder.Services.AddHttpClient<IProductHttpClient, ProductHttpClient>(client =>
 });
 
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
+builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<IOrderService, OrderService.Service.Implementor.OrderService>();
+
+builder.Services.Configure<VnpayConfig>(builder.Configuration.GetSection("Vnpay"));
+builder.Services.AddScoped<IVnpayService, VnpayService>();
 
 builder.Services.AddJwtAuthentication();
 

@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using OrderService.Model.DBContext;
 using OrderService.Model.Entities;
 
-
 namespace OrderService.Repository.Implementor
 {
     public class OrderRepo : IOrderRepo
@@ -14,14 +13,6 @@ namespace OrderService.Repository.Implementor
             _context = context;
         }
 
-        //public async Task<List<Order>> GetAllAsync()
-        //{
-        //    return await _context.Orders
-        //        .Include(o => o.OrderDetails)
-        //        .OrderByDescending(o => o.OrderDate)
-        //        .ToListAsync();
-        //}
-
         public async Task<Order> CreateAsync(Order order)
         {
             _context.Orders.Add(order);
@@ -29,17 +20,25 @@ namespace OrderService.Repository.Implementor
             return order;
         }
 
-        //public async Task<Order?> GetByIdAsync(int orderId)
-        //{
-        //    return await _context.Orders
-        //        .Include(o => o.OrderDetails)
-        //        .FirstOrDefaultAsync(o => o.OrderId == orderId);
-        //}
+        public async Task<Order?> GetByIdAsync(int orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
 
-        //public async Task UpdateAsync(Order order)
-        //{
-        //    _context.Orders.Update(order);
-        //    await _context.SaveChangesAsync();
-        //}
+        public async Task<Order?> GetByOrderNumberAsync(string orderNumber)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .Include(o => o.Transactions)
+                .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
+        }
+
+        public async Task UpdateAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
     }
 }

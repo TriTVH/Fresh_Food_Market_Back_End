@@ -339,6 +339,61 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/payment/vnpay/create",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/payment/vnpay/create",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/payment/vnpay/ipn",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/payment/vnpay/ipn",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ]
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/payment/vnpay/return",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/payment/vnpay/return",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ]
+    },
+    {
+      "SwaggerKey": "order-service-redis",
+      "UpstreamPathTemplate": "/payment/vnpay/dev/simulate",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/payment/vnpay/dev/simulate",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice_redis.api",
+          "Port": 7500
+        }
+      ]
     }
   ],
   "SwaggerEndPoints": [

@@ -3,11 +3,6 @@ using OrderService.Repository;
 using OrderService.Service.DTO.Request;
 using OrderService.Service.HttpClients;
 using OrderService.Service.Saga.Orchestator.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderService.Service.Saga.Orchestator.Steps
 {
@@ -18,16 +13,28 @@ namespace OrderService.Service.Saga.Orchestator.Steps
         private readonly IOrderRepo _orderRepo;
         private readonly IProductHttpClient _productHttpClient;
 
-        public CreateOrderStep(CreateOrderModel request, IOrderRepo orderRepo, IProductHttpClient productHttpClient,string accountUsername)
+        public CreateOrderStep(CreateOrderModel request, IOrderRepo orderRepo, IProductHttpClient productHttpClient, string accountUsername)
         {
             _request = request;
             _orderRepo = orderRepo;
             _productHttpClient = productHttpClient;
+            _accountUsername = accountUsername;
         }
 
-        public Task CompensateAsync(SagaContext sagaContext)
+        public async Task CompensateAsync(SagaContext sagaContext)
         {
-            return Task.CompletedTask;
+            if (sagaContext.OrderId > 0)
+            {
+                var order = await _orderRepo.GetByIdAsync(sagaContext.OrderId);
+                if (order != null)
+                {
+                    order.Status = "CANCELLED";
+                    order.CancelReason = "Payment failed — saga compensation";
+                    order.CancelledDate = DateTime.UtcNow;
+                    order.UpdatedDate = DateTime.UtcNow;
+                    await _orderRepo.UpdateAsync(order);
+                }
+            }
         }
 
         public async Task ExecuteAsync(SagaContext sagaContext)
@@ -54,10 +61,9 @@ namespace OrderService.Service.Saga.Orchestator.Steps
             {
                 var product = await _productHttpClient.GetProductByIdAsync(_request.Items[i].ProductId);
                 if (product == null)
-                {
                     throw new Exception($"Product with ID {_request.Items[i].ProductId} not found.");
-                }
-                var unitPrice = product.PriceSell; // đổi lại đúng field giá bên product DTO của bạn
+
+                var unitPrice = product.PriceSell;
                 var lineTotal = unitPrice * _request.Items[i].Quantity;
                 order.OrderDetails.Add(new OrderDetail
                 {
@@ -71,17 +77,17 @@ namespace OrderService.Service.Saga.Orchestator.Steps
                 });
                 subTotal += lineTotal;
             }
+
             order.Subtotal = subTotal;
             order.DiscountAmount = 0;
             order.TotalAmount = subTotal - (order.DiscountAmount ?? 0) + (order.ShippingFee ?? 0);
-            var created = await _orderRepo.CreateAsync(order);
 
+            var created = await _orderRepo.CreateAsync(order);
             if (created == null)
-            {
                 throw new Exception("Failed to create order.");
-            }
 
             sagaContext.OrderId = created.OrderId;
+            sagaContext.TotalAmount = created.TotalAmount;
             sagaContext.VoucherIds = _request.VoucherIds;
         }
     }

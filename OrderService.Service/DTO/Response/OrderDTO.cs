@@ -6,6 +6,8 @@ namespace OrderService.Service.DTO.Response
         public string OrderNumber { get; set; } = null!;
         public string? Status { get; set; }
         public decimal TotalAmount { get; set; }
+        public int? TransactionId { get; set; }
+        public string? TransactionStatus { get; set; }
         public List<OrderDetailDTO> Items { get; set; } = new();
     }
 
@@ -15,7 +17,7 @@ namespace OrderService.Service.DTO.Response
         public int ProductId { get; set; }
         public string? ProductName { get; set; }
         public int Quantity { get; set; }
-        public int? Price { get; set; }
+        public decimal? Price { get; set; }
         public decimal Subtotal { get; set; }
     }
 }

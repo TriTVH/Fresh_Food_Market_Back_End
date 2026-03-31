@@ -8,6 +8,10 @@ using RedisConfiguration.RedisStreamBus;
 using RedisConfiguration.RedisStreamBus.Implementor;
 using RedisConfiguration.Utils;
 using StackExchange.Redis;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -143,4 +147,151 @@ app.MapPost("/orders/{orderId}/move-to-packaging", async (
     });
 });
 
+// ── VNPAY Payment endpoints ──────────────────────────────────────────────────
+
+app.MapPost("/payment/vnpay/create", async (
+    VnpayPayRequest req,
+    OrderStore orderStore,
+    IConfiguration config) =>
+{
+    var order = await orderStore.Get(req.OrderNumber);
+    if (order is null)
+        return Results.NotFound(new { success = false, message = $"Order '{req.OrderNumber}' not found" });
+
+    if (order.OrderStatus != "PENDING")
+        return Results.BadRequest(new { success = false, message = $"Order is not eligible for payment (status: {order.OrderStatus})" });
+
+    var tmnCode   = config["Vnpay:TmnCode"]!;
+    var hashSecret = config["Vnpay:HashSecret"]!;
+    var baseUrl   = config["Vnpay:BaseUrl"]!;
+    var returnUrl = config["Vnpay:ReturnUrl"]!;
+    var version   = config["Vnpay:Version"]!;
+    var command   = config["Vnpay:Command"]!;
+    var currCode  = config["Vnpay:CurrCode"]!;
+    var locale    = config["Vnpay:Locale"]!;
+
+    var amount = (long)(order.TotalAmount * 100);
+    var createDate = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss");
+    var ipAddr = "127.0.0.1";
+
+    var vnpParams = new SortedDictionary<string, string>
+    {
+        ["vnp_Version"]    = version,
+        ["vnp_Command"]    = command,
+        ["vnp_TmnCode"]    = tmnCode,
+        ["vnp_Amount"]     = amount.ToString(),
+        ["vnp_CurrCode"]   = currCode,
+        ["vnp_TxnRef"]     = order.OrderId,
+        ["vnp_OrderInfo"]  = $"Thanh toan don hang {order.OrderId}",
+        ["vnp_OrderType"]  = "other",
+        ["vnp_Locale"]     = locale,
+        ["vnp_ReturnUrl"]  = returnUrl,
+        ["vnp_IpAddr"]     = ipAddr,
+        ["vnp_CreateDate"] = createDate,
+        ["vnp_ExpireDate"] = DateTime.UtcNow.AddHours(7).AddMinutes(15).ToString("yyyyMMddHHmmss"),
+    };
+
+    var queryString = string.Join("&", vnpParams.Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"));
+    var rawHash = string.Join("&", vnpParams.Select(kv => $"{kv.Key}={kv.Value}"));
+    using var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hashSecret));
+    var hash = Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes(rawHash))).ToLower();
+
+    var context = new OrderSerRedisContext();
+    var txn = new Transaction
+    {
+        OrderId   = order.OrderId,
+        Type      = "PAYMENT",
+        Direction = "DEBIT",
+        Amount    = order.TotalAmount,
+        Status    = "PENDING",
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow,
+    };
+    context.Transactions.Add(txn);
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new
+    {
+        success     = true,
+        orderNumber = order.OrderId,
+        amount      = order.TotalAmount,
+        paymentUrl  = $"{baseUrl}?{queryString}&vnp_SecureHash={hash}"
+    });
+});
+
+app.MapGet("/payment/vnpay/ipn", async (HttpRequest request, OrderStore orderStore, IConfiguration config) =>
+{
+    var query = request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
+    var hashSecret = config["Vnpay:HashSecret"]!;
+
+    query.TryGetValue("vnp_SecureHash", out var receivedHash);
+    var signParams = new SortedDictionary<string, string>(
+        query.Where(k => k.Key.StartsWith("vnp_") && k.Key != "vnp_SecureHash")
+             .ToDictionary(k => k.Key, v => v.Value));
+    var rawHash = string.Join("&", signParams.Select(kv => $"{kv.Key}={kv.Value}"));
+    using var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hashSecret));
+    var calcHash = Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes(rawHash))).ToLower();
+
+    if (!string.Equals(calcHash, receivedHash, StringComparison.OrdinalIgnoreCase))
+        return Results.Ok(new { RspCode = "97", Message = "Invalid signature" });
+
+    query.TryGetValue("vnp_TxnRef", out var orderId);
+    query.TryGetValue("vnp_ResponseCode", out var responseCode);
+    query.TryGetValue("vnp_TransactionStatus", out var txnStatus);
+
+    var isSuccess = responseCode == "00" && txnStatus == "00";
+
+    var context = new OrderSerRedisContext();
+    var order = await context.Orders
+        .Include(o => o.Transactions)
+        .FirstOrDefaultAsync(o => o.Id == orderId);
+
+    if (order is null)
+        return Results.Ok(new { RspCode = "01", Message = "Order not found" });
+
+    var txn = order.Transactions.FirstOrDefault(t => t.Type == "PAYMENT" && t.Status == "PENDING");
+    if (txn != null)
+    {
+        txn.Status    = isSuccess ? "SUCCESS" : "FAILED";
+        txn.UpdatedAt = DateTime.UtcNow;
+    }
+    order.Status    = isSuccess ? "CONFIRMED" : "CANCELLED";
+    order.UpdatedAt = DateTime.UtcNow;
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new { RspCode = "00", Message = "Confirmed" });
+});
+
+app.MapGet("/payment/vnpay/return", (HttpRequest request) =>
+{
+    var qs = request.QueryString.Value;
+    return Results.Ok(new { message = "Payment return received", query = qs });
+});
+
+app.MapPost("/payment/vnpay/dev/simulate", async (VnpaySimulateRequest req, OrderStore orderStore) =>
+{
+    var context = new OrderSerRedisContext();
+    var order = await context.Orders
+        .Include(o => o.Transactions)
+        .FirstOrDefaultAsync(o => o.Id == req.OrderNumber);
+
+    if (order is null)
+        return Results.NotFound(new { success = false, message = $"Order '{req.OrderNumber}' not found" });
+
+    var txn = order.Transactions.FirstOrDefault(t => t.Type == "PAYMENT" && t.Status == "PENDING");
+    if (txn != null)
+    {
+        txn.Status    = req.Success ? "SUCCESS" : "FAILED";
+        txn.UpdatedAt = DateTime.UtcNow;
+    }
+    order.Status    = req.Success ? "CONFIRMED" : "CANCELLED";
+    order.UpdatedAt = DateTime.UtcNow;
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new { success = true, orderStatus = order.Status });
+});
+
 app.Run();
+
+record VnpayPayRequest(string OrderNumber);
+record VnpaySimulateRequest(string OrderNumber, bool Success = true);

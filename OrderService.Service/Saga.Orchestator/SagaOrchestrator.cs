@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OrderService.Service.Saga.Orchestator.Context;
 
 namespace OrderService.Service.Saga.Orchestator
 {
@@ -10,40 +6,43 @@ namespace OrderService.Service.Saga.Orchestator
     {
         private readonly List<ISagaStep> _steps = new();
         private readonly List<ISagaStep> _executed = new();
+        private readonly SagaContext _context = new();
+
         public SagaOrchestrator AddStep(ISagaStep step)
         {
             _steps.Add(step);
             return this;
         }
 
-        public async Task ExecuteAsync()
+        public async Task<SagaContext> ExecuteAsync()
         {
             foreach (var step in _steps)
             {
                 try
                 {
-                    await step.ExecuteAsync();
+                    await step.ExecuteAsync(_context);
                     _executed.Add(step);
                 }
-                catch (Exception ex)
+                catch
                 {
                     await CompensateAsync();
                     throw;
                 }
             }
+            return _context;
         }
 
         private async Task CompensateAsync()
         {
             foreach (var step in _executed.AsEnumerable().Reverse())
             {
-                try 
-                { 
-                    await step.CompensateAsync(); 
+                try
+                {
+                    await step.CompensateAsync(_context);
                 }
-                catch (Exception ex) 
-                { 
-                    Console.WriteLine($"⚠️ Compensation failed: {ex.Message}"); 
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Compensation failed: {ex.Message}");
                 }
             }
         }
