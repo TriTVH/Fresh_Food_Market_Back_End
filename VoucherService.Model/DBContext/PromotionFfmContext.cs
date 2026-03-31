@@ -100,8 +100,12 @@ public partial class PromotionFfmContext : DbContext
             entity.Property(e => e.AppliedDate).HasColumnName("applied_date");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
-            entity.Property(e => e.DiscountAmount).HasColumnName("discount_amount")
-            .HasColumnType("decimal(18, 2)");
+            entity.Ignore(e => e.DiscountAmount);
+
+            entity.HasOne(d => d.Voucher).WithMany(p => p.VoucherDetails)
+                .HasForeignKey(d => d.VoucherId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_voucher_detail_voucher");
 
             entity.HasOne(d => d.Voucher).WithMany(p => p.VoucherDetails)
                 .HasForeignKey(d => d.VoucherId)

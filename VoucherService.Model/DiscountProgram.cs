@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VoucherService.Model;
 
@@ -9,6 +10,7 @@ public partial class DiscountProgram
 
     public int? DiscountProduct { get; set; }
 
+    [NotMapped]
     public decimal DiscountAmount { get; set; }
     public int DiscountFor { get; set; }
 
