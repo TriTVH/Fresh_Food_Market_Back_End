@@ -1,4 +1,4 @@
-﻿using AccService.Model;
+using AccService.Model;
 using AccService.Repository;
 using AccService.Repository.Implementor;
 using AccService.Service.DTO;
@@ -73,6 +73,11 @@ namespace AccService.Service.Implementor
         {
             try
             {
+                if (loginModel == null || string.IsNullOrEmpty(loginModel.Phone))
+                {
+                    return ApiResponse<AuthenticationToken>.Error(null, "The Phone field is required.", 400);
+                }
+
                 if (loginModel.Phone.Length != 10)
                 {
                     return ApiResponse<AuthenticationToken>.Error(null, "The Phone field is not a valid phone number.", 400);

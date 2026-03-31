@@ -1,4 +1,4 @@
-﻿using AuthService.Model;
+using AuthService.Model;
 using AuthService.Repository;
 using AuthService.Service.DTO;
 using AuthService.Service.DTO.RequestObject;
@@ -30,6 +30,11 @@ namespace AuthService.Service.Implementor
         {
             try
             {
+                if (loginModel == null || string.IsNullOrEmpty(loginModel.Phone))
+                {
+                    return ApiResponse<AuthenticationToken>.Error(null, "The Phone field is required.", 400);
+                }
+
                 if(loginModel.Phone.Length != 10)
                 {
                     return ApiResponse<AuthenticationToken>.Error(null, "The Phone field is not a valid phone number.", 400);
