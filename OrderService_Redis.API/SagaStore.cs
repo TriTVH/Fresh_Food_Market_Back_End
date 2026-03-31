@@ -1,3 +1,4 @@
+using OrderService_Redis.API.Entities;
 using RedisConfiguration.DTOs;
 using System.Collections.Concurrent;
 

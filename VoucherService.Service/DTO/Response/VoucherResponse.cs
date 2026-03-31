@@ -13,8 +13,8 @@ public class VoucherResponse
     public int? MaxUsage { get; set; }
     public int? CurrentUsage { get; set; }
     public int? ValidFrom { get; set; }
-    public DateTime FromDate { get; set; }
-    public DateTime ToDate { get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
     public string? DiscountFor { get; set; }
     public string? Status { get; set; }
     public DateTime? CreatedDate { get; set; }

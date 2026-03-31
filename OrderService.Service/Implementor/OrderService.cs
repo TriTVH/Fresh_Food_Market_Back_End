@@ -3,8 +3,8 @@ using OrderService.Service.DTO;
 using OrderService.Service.DTO.Request;
 using OrderService.Service.DTO.Response;
 using OrderService.Service.HttpClients;
-using OrderService.Service.Saga;
 using OrderService.Model;
+using OrderService.Model.Entities;
 
 namespace OrderService.Service.Implementor
 {
@@ -23,9 +23,9 @@ namespace OrderService.Service.Implementor
         {
             try
             {
-                var saga = new CreateOrderSaga(_orderRepo, _productHttpClient);
-                var result = await saga.ExecuteAsync(request);
-                return ApiResponse<OrderDTO>.Ok(result, "Order created successfully", 201);
+                //var saga = new CreateOrder(_orderRepo, _productHttpClient);
+                //var result = await saga.ExecuteAsync(request);
+                return ApiResponse<OrderDTO>.Ok(null, "Order created successfully", 201);
             }
             catch(InvalidOperationException ex)
             {
@@ -37,64 +37,64 @@ namespace OrderService.Service.Implementor
             }
         }
 
-        public async Task<ApiResponse<List<OrderDTO>>> GetAllOrdersAsync()
-        {
-            try
-            {
-                var orders = await _orderRepo.GetAllAsync();
-                var result = orders.Select(MapToDTO).ToList();
-                return ApiResponse<List<OrderDTO>>.Ok(result, "Orders retrieved successfully", 200);
-            }
-            catch(Exception ex)
-            {
-                return ApiResponse<List<OrderDTO>>.Error(null, ex.Message, 500);
-            }
-        }
+        //public async Task<ApiResponse<List<OrderDTO>>> GetAllOrdersAsync()
+        //{
+        //    try
+        //    {
+        //        var orders = await _orderRepo.GetAllAsync();
+        //        var result = orders.Select(MapToDTO).ToList();
+        //        return ApiResponse<List<OrderDTO>>.Ok(result, "Orders retrieved successfully", 200);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return ApiResponse<List<OrderDTO>>.Error(null, ex.Message, 500);
+        //    }
+        //}
 
-        public async Task<ApiResponse<OrderDTO>> GetOrderByIdAsync(int orderId)
-        {
-            try
-            {
-                var order = await _orderRepo.GetByIdAsync(orderId);
-                if(order == null)
-                    return ApiResponse<OrderDTO>.Error(null, $"Order {orderId} not found", 404);
+        //public async Task<ApiResponse<OrderDTO>> GetOrderByIdAsync(int orderId)
+        //{
+        //    try
+        //    {
+        //        var order = await _orderRepo.GetByIdAsync(orderId);
+        //        if(order == null)
+        //            return ApiResponse<OrderDTO>.Error(null, $"Order {orderId} not found", 404);
 
-                return ApiResponse<OrderDTO>.Ok(MapToDTO(order), "Order retrieved successfully", 200);
-            }
-            catch(Exception ex)
-            {
-                return ApiResponse<OrderDTO>.Error(null, ex.Message, 500);
-            }
-        }
+        //        return ApiResponse<OrderDTO>.Ok(MapToDTO(order), "Order retrieved successfully", 200);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return ApiResponse<OrderDTO>.Error(null, ex.Message, 500);
+        //    }
+        //}
 
-        public async Task<ApiResponse<OrderDTO>> CancelOrderAsync(int orderId, string? cancelReason)
-        {
-            try
-            {
-                var order = await _orderRepo.GetByIdAsync(orderId);
-                if(order == null)
-                    return ApiResponse<OrderDTO>.Error(null, $"Order {orderId} not found", 404);
+        //public async Task<ApiResponse<OrderDTO>> CancelOrderAsync(int orderId, string? cancelReason)
+        //{
+        //    try
+        //    {
+        //        var order = await _orderRepo.GetByIdAsync(orderId);
+        //        if(order == null)
+        //            return ApiResponse<OrderDTO>.Error(null, $"Order {orderId} not found", 404);
 
-                if(order.Status == "cancelled")
-                    throw new InvalidOperationException("Order is already cancelled");
+        //        if(order.Status == "cancelled")
+        //            throw new InvalidOperationException("Order is already cancelled");
 
-                order.Status = "cancelled";
-                order.CancelledDate = DateTime.UtcNow;
-                order.CancelReason = cancelReason;
-                order.UpdatedDate = DateTime.UtcNow;
+        //        order.Status = "cancelled";
+        //        order.CancelledDate = DateTime.UtcNow;
+        //        order.CancelReason = cancelReason;
+        //        order.UpdatedDate = DateTime.UtcNow;
 
-                await _orderRepo.UpdateAsync(order);
-                return ApiResponse<OrderDTO>.Ok(MapToDTO(order), "Order cancelled successfully", 200);
-            }
-            catch(InvalidOperationException ex)
-            {
-                return ApiResponse<OrderDTO>.Error(null, ex.Message, 400);
-            }
-            catch(Exception ex)
-            {
-                return ApiResponse<OrderDTO>.Error(null, ex.Message, 500);
-            }
-        }
+        //        await _orderRepo.UpdateAsync(order);
+        //        return ApiResponse<OrderDTO>.Ok(MapToDTO(order), "Order cancelled successfully", 200);
+        //    }
+        //    catch(InvalidOperationException ex)
+        //    {
+        //        return ApiResponse<OrderDTO>.Error(null, ex.Message, 400);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return ApiResponse<OrderDTO>.Error(null, ex.Message, 500);
+        //    }
+        //}
 
         private static OrderDTO MapToDTO(Order order) => new()
         {
@@ -102,14 +102,12 @@ namespace OrderService.Service.Implementor
             OrderNumber = order.OrderNumber,
             Status = order.Status,
             TotalAmount = order.TotalAmount,
-            OrderDate = order.OrderDate,
             Items = order.OrderDetails.Select(d => new OrderDetailDTO
             {
                 OrderDetailId = d.OrderDetailId,
                 ProductId = d.ProductId,
                 ProductName = d.ProductName,
                 Quantity = d.Quantity,
-                Price = d.Price,
                 Subtotal = d.Subtotal,
             }).ToList(),
         };

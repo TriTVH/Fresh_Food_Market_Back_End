@@ -40,32 +40,78 @@ public class VoucherDetailService : IVoucherDetailService
         return ApiResponse<VoucherDetailResponse>.Ok(Map(item));
     }
 
-    public async Task<ApiResponse<VoucherDetailResponse>> CreateAsync(CreateVoucherDetailRequest request)
+    public async Task<ApiResponse<string>> CreateAsync(CreateVoucherDetailRequest request)
     {
-        var voucher = await _voucherRepository.GetByIdAsync(request.VoucherId);
-        if (voucher == null)
-            return ApiResponse<VoucherDetailResponse>.Error("Voucher not found", 404);
+        List<int> voucherIds = request.VoucherIds.Distinct().ToList();
 
-        if (voucher.MaxUsage.HasValue && voucher.CurrentUsage.GetValueOrDefault() >= voucher.MaxUsage.Value)
-            return ApiResponse<VoucherDetailResponse>.Error("Voucher has reached max usage", 400);
+        var now = DateTime.UtcNow;
 
-        var detail = new VoucherDetail
+        foreach (var voucherId in voucherIds)
         {
-            OrderId = request.OrderId,
-            VoucherId = request.VoucherId,
-            AppliedDate = DateTime.UtcNow
-        };
+            var voucher = await _voucherRepository.GetByIdAsync(voucherId);
+            if(voucher == null)
+            {
+                return ApiResponse<string>.Error($"Voucher {voucherId} does not exist", 400, null);
+            }
+            var error = ValidateSingleVoucher(voucher, request.totalAmountOrder, now);
+            if (error != null)
+            {
+                return ApiResponse<string>.Error(error, 400);
+            }
+            var discountAmount = CalculateDiscountAmount(voucher, request.totalAmountOrder);
 
-        var created = await _voucherDetailRepository.CreateAsync(detail);
+            var voucherDetail = new VoucherDetail
+            {
+                OrderId = request.OrderId,
+                VoucherId = voucher.VoucherId,
+                DiscountAmount = discountAmount,
+                AppliedDate = DateTime.UtcNow
+            };
 
-        voucher.CurrentUsage = voucher.CurrentUsage.GetValueOrDefault() + 1;
-        voucher.UpdatedDate = DateTime.UtcNow;
-        await _voucherRepository.UpdateAsync(voucher);
+            await _voucherDetailRepository.CreateAsync(voucherDetail);
 
-        return ApiResponse<VoucherDetailResponse>.Ok(Map(created), "Voucher detail created successfully", 201);
+            voucher.CurrentUsage += 1;
+            await _voucherRepository.UpdateAsync(voucher);
+        }
+
+        return ApiResponse<string>.Ok(null, "Apply voucher ids successfully", 201);
     }
 
-    private static VoucherDetailResponse Map(VoucherDetail x)
+    private string? ValidateSingleVoucher(Voucher voucher, decimal totalAmountOrder, DateTime now)
+    {
+        if (!string.Equals(voucher.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+            return $"Voucher {voucher.VoucherCode} is not active";
+        if (voucher.MaxUsage.HasValue && voucher.CurrentUsage.HasValue &&
+            voucher.CurrentUsage.Value >= voucher.MaxUsage.Value)
+        {
+            return $"Voucher {voucher.VoucherCode} has reached max usage";
+        }
+        var type = voucher.TypeDiscountTime.Trim().ToUpperInvariant();
+        if (type == "FIXED")
+        {
+            if (now > voucher.ToDate.Value)
+                return $"Voucher {voucher.VoucherCode} is expired";
+        }
+        if (voucher.ValidFrom.HasValue && totalAmountOrder < voucher.ValidFrom.Value)
+            return $"Voucher {voucher.VoucherCode} requires minimum order value of {voucher.ValidFrom.Value}";
+
+        return null;
+    }
+    private decimal CalculateDiscountAmount(Voucher voucher, decimal totalAmountOrder)
+    {
+        if (!voucher.DiscountPercentage.HasValue || voucher.DiscountPercentage.Value <= 0)
+            return 0;
+
+        decimal discount = totalAmountOrder * voucher.DiscountPercentage.Value / 100m;
+
+        if (voucher.DiscountMax.HasValue && voucher.DiscountMax.Value > 0 && discount > voucher.DiscountMax.Value)
+        {
+            discount = voucher.DiscountMax.Value;
+        }
+
+        return Math.Round(discount, 2);
+    }
+    private VoucherDetailResponse Map(VoucherDetail x)
     {
         return new VoucherDetailResponse
         {

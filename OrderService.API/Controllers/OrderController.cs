@@ -14,43 +14,48 @@ namespace OrderService.API.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService, IHttpContextAccessor httpContextAccessor)
         {
             _orderService = orderService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
+        //[HttpPost]
+        //public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
+        //{
+        //    var response = await _orderService.CreateOrderAsync(request);
+        //    return StatusCode(response.StatusCode, response);
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var response = await _orderService.GetAllOrdersAsync();
+        //    return StatusCode(response.StatusCode, response);
+        //}
+
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetById(int id)
+        //{
+        //    var response = await _orderService.GetOrderByIdAsync(id);
+        //    return StatusCode(response.StatusCode, response);
+        //}
+
+        //[HttpPut("{id}/cancel")]
+        //public async Task<IActionResult> Cancel(int id, [FromBody] CancelOrderRequest request)
+        //{
+        //    var response = await _orderService.CancelOrderAsync(id, request.CancelReason);
+        //    return StatusCode(response.StatusCode, response);
+        //}
+
+        private string? GetUsername()
         {
-            var response = await _orderService.CreateOrderAsync(request);
-            return StatusCode(response.StatusCode, response);
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value
+                ?? _httpContextAccessor.HttpContext?.User?.FindFirst("username")?.Value;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var response = await _orderService.GetAllOrdersAsync();
-            return StatusCode(response.StatusCode, response);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var response = await _orderService.GetOrderByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
-        }
-
-        [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> Cancel(int id, [FromBody] CancelOrderRequest request)
-        {
-            var response = await _orderService.CancelOrderAsync(id, request.CancelReason);
-            return StatusCode(response.StatusCode, response);
-        }
     }
-
-    public class CancelOrderRequest
-    {
-        public string? CancelReason { get; set; }
-    }
+ 
 }

@@ -229,6 +229,22 @@
       }
     },
     {
+      "SwaggerKey": "voucher-service",
+      "UpstreamPathTemplate": "/voucher-detail/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/voucher-detail/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "voucherservice.api",
+          "Port": 7400
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
       "SwaggerKey": "order-service-redis",
       "UpstreamPathTemplate": "/orders/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],

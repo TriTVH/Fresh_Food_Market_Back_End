@@ -6,7 +6,6 @@ namespace OrderService.Service.DTO.Response
         public string OrderNumber { get; set; } = null!;
         public string? Status { get; set; }
         public decimal TotalAmount { get; set; }
-        public DateTime? OrderDate { get; set; }
         public List<OrderDetailDTO> Items { get; set; } = new();
     }
 

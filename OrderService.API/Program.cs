@@ -26,6 +26,8 @@ builder.Services.AddDbContext<OrderMgmtFfmContext>(options =>
         })
 );
 
+builder.Services.AddHttpContextAccessor();
+
 // HTTP client for ProductCatalogService
 builder.Services.AddHttpClient<IProductHttpClient, ProductHttpClient>(client =>
 {

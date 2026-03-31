@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using OrderService.Model;
+using OrderService.Model.Entities;
 
 namespace OrderService.Model.DBContext;
 
@@ -16,9 +16,13 @@ public partial class OrderMgmtFfmContext : DbContext
     {
     }
 
+    public virtual DbSet<Feedback> Feedbacks { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+
+    public virtual DbSet<SubscriptionTicket> SubscriptionTickets { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -26,6 +30,26 @@ public partial class OrderMgmtFfmContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Feedback>(entity =>
+        {
+            entity.ToTable("feedback");
+
+            entity.Property(e => e.FeedbackId).HasColumnName("feedback_id");
+            entity.Property(e => e.Comment).HasColumnName("comment");
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.FeedbackDate).HasColumnName("feedback_date");
+            entity.Property(e => e.OrderDetailId).HasColumnName("order_detail_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Rating)
+                .HasColumnType("decimal(3, 2)")
+                .HasColumnName("rating");
+
+            entity.HasOne(d => d.OrderDetail).WithMany(p => p.Feedbacks)
+                .HasForeignKey(d => d.OrderDetailId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_feedback_order_detail");
+        });
+
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.OrderId).HasName("PK__order__46596229DA72084E");
@@ -35,7 +59,9 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.HasIndex(e => e.OrderNumber, "UQ__order__730E34DF5ECDF696").IsUnique();
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.AccountUsername)
+                .HasMaxLength(50)
+                .HasColumnName("account_email");
             entity.Property(e => e.CancelReason).HasColumnName("cancel_reason");
             entity.Property(e => e.CancelledDate).HasColumnName("cancelled_date");
             entity.Property(e => e.ConfirmedDate).HasColumnName("confirmed_date");
@@ -58,10 +84,6 @@ public partial class OrderMgmtFfmContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("payment_method");
-            entity.Property(e => e.PaymentStatus)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("payment_status");
             entity.Property(e => e.ShippedDate).HasColumnName("shipped_date");
             entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address");
             entity.Property(e => e.ShippingFee)
@@ -90,7 +112,10 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.Property(e => e.UpdatedDate)
                 .HasDefaultValueSql("(sysdatetime())")
                 .HasColumnName("updated_date");
-            entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
+
+            entity.HasOne(d => d.Subscription).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.SubscriptionId)
+                .HasConstraintName("fk_order_subscription");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -108,7 +133,9 @@ public partial class OrderMgmtFfmContext : DbContext
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("discount_per_item");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("price");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(100)
@@ -121,6 +148,35 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("fk_order_detail_order");
+        });
+
+        modelBuilder.Entity<SubscriptionTicket>(entity =>
+        {
+            entity.HasKey(e => e.SubscriptionId).HasName("PK__subscrip__863A7EC1601804D8");
+
+            entity.ToTable("subscription_ticket");
+
+            entity.Property(e => e.SubscriptionId).HasColumnName("subscription_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.Frequency)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("frequency");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("status");
+            entity.Property(e => e.TotalOrders)
+                .HasDefaultValue(0)
+                .HasColumnName("total_orders");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetime())")
+                .HasColumnName("updated_at");
         });
 
         OnModelCreatingPartial(modelBuilder);

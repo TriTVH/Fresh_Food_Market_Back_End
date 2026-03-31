@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrderService.Model;
+namespace OrderService.Model.Entities;
 
 public partial class OrderDetail
 {
@@ -17,11 +17,13 @@ public partial class OrderDetail
 
     public decimal Subtotal { get; set; }
 
-    public int? Price { get; set; }
+    public decimal? Price { get; set; }
 
     public string? ProductName { get; set; }
 
     public DateTime? CreatedAt { get; set; }
+
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual Order Order { get; set; } = null!;
 }

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrderService.Model;
+namespace OrderService.Model.Entities;
 
 public partial class Order
 {
     public int OrderId { get; set; }
 
-    public int AccountId { get; set; }
+    public string AccountUsername { get; set; } = null!;
 
     public int? SubscriptionId { get; set; }
-
-    public int? VoucherId { get; set; }
 
     public string OrderNumber { get; set; } = null!;
 
@@ -26,8 +24,6 @@ public partial class Order
     public string? ShippingAddress { get; set; }
 
     public string? PaymentMethod { get; set; }
-
-    public string? PaymentStatus { get; set; }
 
     public decimal? Subtotal { get; set; }
 
@@ -52,4 +48,6 @@ public partial class Order
     public DateTime? UpdatedDate { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
+    public virtual SubscriptionTicket? Subscription { get; set; }
 }

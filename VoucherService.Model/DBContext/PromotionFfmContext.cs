@@ -61,17 +61,11 @@ public partial class PromotionFfmContext : DbContext
             entity.ToTable("voucher");
 
             entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
-            entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.CreatedDate).HasColumnName("created_date");
             entity.Property(e => e.CurrentUsage).HasColumnName("current_usage");
             entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.DiscountAmount)
-                .HasColumnType("decimal(15, 2)")
-                .HasColumnName("discount_amount");
-            entity.Property(e => e.DiscountFor)
-                .HasMaxLength(150)
-                .IsUnicode(false)
-                .HasColumnName("discount_for");
+            entity.Property(e => e.DiscountMax).HasColumnName("discount_max")
+            .HasColumnType("decimal(18, 2)");
             entity.Property(e => e.DiscountPercentage)
                 .HasColumnType("decimal(5, 2)")
                 .HasColumnName("discount_percentage");
@@ -94,7 +88,7 @@ public partial class PromotionFfmContext : DbContext
                 .HasColumnName("voucher_code");
             entity.Property(e => e.VoucherName)
                 .HasMaxLength(200)
-                .IsUnicode(false)
+                .IsUnicode(true)
                 .HasColumnName("voucher_name");
         });
 
@@ -106,6 +100,8 @@ public partial class PromotionFfmContext : DbContext
             entity.Property(e => e.AppliedDate).HasColumnName("applied_date");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
+            entity.Property(e => e.DiscountAmount).HasColumnName("discount_amount")
+            .HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Voucher).WithMany(p => p.VoucherDetails)
                 .HasForeignKey(d => d.VoucherId)
