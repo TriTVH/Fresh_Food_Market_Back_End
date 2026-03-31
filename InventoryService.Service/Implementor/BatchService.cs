@@ -241,7 +241,8 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                                 Provided = 0,
                                 Missing = detail.Quantity
                             });
-
+                            detail.Quantity = 0;
+                            detail.ExpiredDate = item.ExpiredDate;
                             continue;
                         }
                         if (item.Quantity < 0)
@@ -301,7 +302,6 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                     note.UndeliverableSupplies = unprovidedProducts;
 
                     batch.CreatedBy = username;
-
                     batch.Notes = SerializeBatchNote(note);
                     batch.Status = "PACKAGING";
                     batch.UpdatedDate = DateTime.UtcNow;
@@ -376,29 +376,24 @@ public async Task<ApiResponse<BatchDTO>> GetBatchByIdAsync(int id)
                             Extra = extra,
                             Status = missing > 0 ? "INSUFFICIENT" : (extra > 0 ? "EXTRA" : "SUFFICIENT")
                         });
+                        detail.Quantity = provided;
+                        detail.ExpiredDate = item.ExpiredDate;
                     }
                     var sagaResult = await _batchSagaService.ProcessBatch(request.Items);
 
-                    if (!sagaResult.IsNullOrEmpty())
+                    if (!string.IsNullOrWhiteSpace(sagaResult))
                     {
                         if(sagaResult.Contains("Product not found or be deleted") || sagaResult.Contains("Batch Detail not found"))
                         {
-                            note = DeserializeBatchNote(batch.Notes);
-                            note.CancelInfo = new CancelInfoNote
-                            {
-                                CancelledAt = DateTime.UtcNow,
-                                Reason = sagaResult + ". Batch cancelled due to data inconsistency. Please review the batch details and product information, then create a new batch if needed."
-                            };
-
-                            batch.Notes = SerializeBatchNote(note);
-                            batch.Status = "CANCELED";
+                       
+                            batch.Status = "DELIVERING";
                             batch.UpdatedDate = DateTime.UtcNow;
                             
                             await _repo.UpdateBatchAsync(batch);
 
                                 return ApiResponse<BatchDTO>.Error(
                                     null,
-                                    sagaResult+ ". Batch cancelled due to data inconsistency.",
+                                    sagaResult+ ". Please review the batch details and product informations, then cancel and create a new batch if needed.",
                                     409
                                 );
                         }

@@ -10,6 +10,7 @@ public partial class VoucherDetail
     public int OrderId { get; set; }
 
     public int VoucherId { get; set; }
+    public decimal DiscountAmount { get; set; }
 
     public DateTime? AppliedDate { get; set; }
 

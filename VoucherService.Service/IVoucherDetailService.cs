@@ -9,5 +9,5 @@ public interface IVoucherDetailService
     Task<ApiResponse<List<VoucherDetailResponse>>> GetAllAsync();
     Task<ApiResponse<List<VoucherDetailResponse>>> GetByVoucherIdAsync(int voucherId);
     Task<ApiResponse<VoucherDetailResponse>> GetByIdAsync(int id);
-    Task<ApiResponse<VoucherDetailResponse>> CreateAsync(CreateVoucherDetailRequest request);
+    Task<ApiResponse<string>> CreateAsync(CreateVoucherDetailRequest request);
 }

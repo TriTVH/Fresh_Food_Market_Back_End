@@ -47,6 +47,12 @@ services:
       context: .
       dockerfile: VoucherService.API/Dockerfile
 
+  orderservice.api:
+    image: ffm-orderserviceapi
+    build:
+      context: .
+      dockerfile: OrderService.API/Dockerfile
+
 volumes:
    rabbitmq_data:
 

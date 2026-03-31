@@ -12,7 +12,7 @@ namespace InventoryService.Repository
         Task<Batch> AddBatchAsync(Batch batch);
         Task<Batch> UpdateBatchAsync(Batch batch);
         Task<Batch> DeleteBatchAsync(Batch batch);
-        Task<Batch> GetBatchByIdAsync(int id);
+        Task<Batch?> GetBatchByIdAsync(int id);
         Task<List<Batch>> GetAllBatchesAsync();
         Task<int> CountBatchBySupplierAsync(int supplierId);
     }

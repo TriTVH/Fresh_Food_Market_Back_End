@@ -9,6 +9,7 @@ public partial class DiscountProgram
 
     public int? DiscountProduct { get; set; }
 
+    public decimal DiscountAmount { get; set; }
     public int DiscountFor { get; set; }
 
     public string TypeDiscount { get; set; } = null!;

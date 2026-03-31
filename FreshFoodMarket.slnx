@@ -20,6 +20,13 @@
     <Project Path="InventoryService.Repository/InventoryService.Repository.csproj" Id="b1c08921-fa5c-4b98-9596-4c332d7433aa" />
     <Project Path="InventoryService.Service/InventoryService.Service.csproj" Id="5f2ee532-8c68-47c2-a339-1c402bb829e1" />
   </Folder>
+
+  <Folder Name="/OrderService/">
+    <Project Path="OrderService.API/OrderService.API.csproj" Id="14152352-9741-4c37-8bb9-2d62f1b59927" />
+    <Project Path="OrderService.Model/OrderService.Model.csproj" Id="a911e6f2-bebf-4221-8e8a-116fb8842e99" />
+    <Project Path="OrderService.Repository/OrderService.Repository.csproj" Id="88403ede-0b49-4ef7-b1de-8419b4ef5d0f" />
+    <Project Path="OrderService.Service/OrderService.Service.csproj" Id="307cfc3f-ea45-48da-9f4d-c781c1f709e9" />
+  </Folder>
   <Folder Name="/InventoryService_Redis/">
     <Project Path="InventoryService_Redis.API/InventoryService_Redis.API.csproj" Id="598e4067-5373-493a-9dc4-562aed2fbf5b" />
   </Folder>

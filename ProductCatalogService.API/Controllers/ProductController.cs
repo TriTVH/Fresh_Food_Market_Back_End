@@ -77,14 +77,9 @@ namespace ProductCatalogService.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductModel request)
+        [HttpPut]
+        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductModel request)
         {
-            if (id != request.ProductId)
-            {
-                return BadRequest(ApiResponse<object>.Error(null, "ID trên route và trong body không khớp", 400));
-            }
-
 
             if (!ModelState.IsValid)
             {

@@ -34,7 +34,7 @@ namespace InventoryService.Repository.Implementors
             await _context.SaveChangesAsync();
             return entry.Entity;
         }
-        public async Task<Batch> GetBatchByIdAsync(int id)
+        public async Task<Batch?> GetBatchByIdAsync(int id)
         {
             return await _context.Batches
                 .Include(x => x.BatchDetails)

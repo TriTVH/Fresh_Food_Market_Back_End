@@ -1,6 +1,8 @@
 using OrderService_Redis.API;
+using OrderService_Redis.API.Entities;
 using RedisConfiguration.Command;
 using RedisConfiguration.Contract;
+using RedisConfiguration.DTOs;
 using RedisConfiguration.Message;
 using RedisConfiguration.RedisStreamBus;
 using RedisConfiguration.RedisStreamBus.Implementor;
@@ -8,6 +10,7 @@ using RedisConfiguration.Utils;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379,abortConnect=false";
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
@@ -50,37 +53,38 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.MapPost("/orders", (CreateOrderRequest request, OrderStore orderStore) =>
+app.MapPost("/orders", async (CreateOrderRequest request, OrderStore orderStore) =>
 {
-    if (string.IsNullOrWhiteSpace(request.UserId))
-        return Results.BadRequest(new { message = "UserId is required" });
 
     if (request.Items is null || request.Items.Count == 0)
         return Results.BadRequest(new { message = "Items are required" });
 
-    var order = orderStore.Create(request);
+    var order = await orderStore.Create(request);
 
     return Results.Ok(new
     {
         order.OrderId,
-        order.UserId,
-        order.PaymentMethod,
-        order.PaymentStatus,
         order.OrderStatus
     });
 });
 
-app.MapGet("/orders", (OrderStore orderStore) => Results.Ok(orderStore.GetAll()));
-
-app.MapGet("/orders/{orderId}", (string orderId, OrderStore orderStore) =>
+app.MapGet("/orders", async (OrderStore orderStore) =>
 {
-    var order = orderStore.Get(orderId);
+    var orders = await orderStore.GetAll();
+    return Results.Ok(orders);
+});
+
+app.MapGet("/orders/{orderId}", async (string orderId, OrderStore orderStore) =>
+{
+    var order = await orderStore.Get(orderId);
     return order is null ? Results.NotFound() : Results.Ok(order);
 });
 
@@ -92,7 +96,7 @@ app.MapPost("/orders/{orderId}/move-to-packaging", async (
     SagaStore sagaStore,
     IRedisStreamBus bus) =>
 {
-    var order = orderStore.Get(orderId);
+    var order = await orderStore.Get(orderId);
     if (order is null)
         return Results.NotFound(new { message = "Order not found" });
 
@@ -102,8 +106,6 @@ app.MapPost("/orders/{orderId}/move-to-packaging", async (
         {
             message = "Order is not eligible to move to PACKAGING",
             order.OrderStatus,
-            order.PaymentMethod,
-            order.PaymentStatus
         });
     }
 
@@ -115,7 +117,12 @@ app.MapPost("/orders/{orderId}/move-to-packaging", async (
     {
         SagaId = saga.SagaId,
         OrderId = order.OrderId,
-        Items = order.Items
+        Items = order.Items.Select(i => new OrderItemDTO
+        {
+            ProductId = i.ProductId,
+            Quantity = i.Quantity,
+            CreatedAt = DateTime.UtcNow // hoặc i.CreatedAt nếu có
+        }).ToList()
     };
 
     await bus.PublishAsync(StreamConstants.InventoryCommands, new StreamEnvelope

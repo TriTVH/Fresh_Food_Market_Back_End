@@ -8,6 +8,7 @@ services:
       - productcatalogservice.api
       - blogservice.api
       - inventoryservice.api
+      - orderservice.api
     ports:
       - "5000:5000"
     networks:
@@ -45,7 +46,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=7200
       - ExternalServices__ProductCatalogBaseUrl=http://productcatalogservice.api:7000/
     ports:
-      - "7200:7200" 
+      - "7200:7200"
     networks:
       - ffm-network
     restart: always
@@ -58,6 +59,7 @@ services:
     networks:
       - ffm-network
     restart: always
+
 
   orderservice_redis.api:
     environment:
@@ -90,15 +92,19 @@ services:
     networks:
       - ffm-network
     restart: always
- 
+
+  orderservice.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7700
+    ports:
+      - "7700:7700"
+    networks:
+      - ffm-network
+    restart: always
 
 networks:
   ffm-network:
-     driver: bridge
-     
+    driver: bridge
 
-
-
-
-
-
+ 

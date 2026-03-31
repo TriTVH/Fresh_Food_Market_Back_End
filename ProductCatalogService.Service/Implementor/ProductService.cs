@@ -280,6 +280,7 @@ namespace ProductCatalogService.Service.Implementor
                 product.UpdatedAt = DateTime.UtcNow;
 
                 var updated = await _productRepo.UpdateAsync(product);
+                
                 await _productRedisCacheService.ReloadAllProductsFromDbToRedisAsync();
 
                 var result = new ProductDTO
