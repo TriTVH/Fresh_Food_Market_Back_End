@@ -239,10 +239,7 @@
           "Host": "voucherservice.api",
           "Port": 7400
         }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
+      ]
     },
     {
       "SwaggerKey": "order-service-redis",

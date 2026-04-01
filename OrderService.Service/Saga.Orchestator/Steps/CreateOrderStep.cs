@@ -8,12 +8,13 @@ namespace OrderService.Service.Saga.Orchestator.Steps
 {
     public class CreateOrderStep : ISagaStep
     {
-        private readonly string _accountUsername;
         private readonly CreateOrderModel _request;
+        private readonly string _accountUsername;
         private readonly IOrderRepo _orderRepo;
         private readonly IProductHttpClient _productHttpClient;
 
-        public CreateOrderStep(CreateOrderModel request, IOrderRepo orderRepo, IProductHttpClient productHttpClient, string accountUsername)
+
+        public CreateOrderStep( IOrderRepo orderRepo, IProductHttpClient productHttpClient, CreateOrderModel request, string accountUsername)
         {
             _request = request;
             _orderRepo = orderRepo;
@@ -23,18 +24,16 @@ namespace OrderService.Service.Saga.Orchestator.Steps
 
         public async Task CompensateAsync(SagaContext sagaContext)
         {
-            if (sagaContext.OrderId > 0)
+
+            var order = await _orderRepo.GetByIdAsync(sagaContext.OrderId);
+
+            if(order == null)
             {
-                var order = await _orderRepo.GetByIdAsync(sagaContext.OrderId);
-                if (order != null)
-                {
-                    order.Status = "CANCELLED";
-                    order.CancelReason = "Payment failed — saga compensation";
-                    order.CancelledDate = DateTime.UtcNow;
-                    order.UpdatedDate = DateTime.UtcNow;
-                    await _orderRepo.UpdateAsync(order);
-                }
+                return;
             }
+
+            await _orderRepo.DeleteAsync(order);
+
         }
 
         public async Task ExecuteAsync(SagaContext sagaContext)
@@ -43,7 +42,6 @@ namespace OrderService.Service.Saga.Orchestator.Steps
             {
                 AccountUsername = _accountUsername,
                 OrderNumber = "ORD-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
-                OrderDate = DateTime.UtcNow,
                 Status = "PENDING",
                 ShippingName = _request.ShippingName,
                 ShippingPhone = _request.ShippingPhone,
@@ -52,6 +50,7 @@ namespace OrderService.Service.Saga.Orchestator.Steps
                 PaymentMethod = _request.PaymentMethod,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
+                
                 OrderDetails = new List<OrderDetail>()
             };
 
@@ -61,9 +60,11 @@ namespace OrderService.Service.Saga.Orchestator.Steps
             {
                 var product = await _productHttpClient.GetProductByIdAsync(_request.Items[i].ProductId);
                 if (product == null)
-                    throw new Exception($"Product with ID {_request.Items[i].ProductId} not found.");
 
-                var unitPrice = product.PriceSell;
+                {
+                    throw new InvalidOperationException($"Product with ID {_request.Items[i].ProductId} not found.");
+                }
+                var unitPrice = product.PriceSell; // đổi lại đúng field giá bên product DTO của bạn
                 var lineTotal = unitPrice * _request.Items[i].Quantity;
                 order.OrderDetails.Add(new OrderDetail
                 {
@@ -80,15 +81,21 @@ namespace OrderService.Service.Saga.Orchestator.Steps
 
             order.Subtotal = subTotal;
             order.DiscountAmount = 0;
-            order.TotalAmount = subTotal - (order.DiscountAmount ?? 0) + (order.ShippingFee ?? 0);
+
+            order.TotalAmount = subTotal + (order.ShippingFee ?? 0);
+            var created = await _orderRepo.CreateAsync(order);
+
 
             var created = await _orderRepo.CreateAsync(order);
             if (created == null)
-                throw new Exception("Failed to create order.");
+            {
+                throw new InvalidOperationException("Failed to create order.");
+            }
 
             sagaContext.OrderId = created.OrderId;
             sagaContext.TotalAmount = created.TotalAmount;
             sagaContext.VoucherIds = _request.VoucherIds;
+            sagaContext.TotalAmountOrder = created.Subtotal;
         }
     }
 }

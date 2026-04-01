@@ -1,3 +1,4 @@
+using System.Runtime.ConstrainedExecution;
 using VoucherService.Model;
 using VoucherService.Repository;
 using VoucherService.Service.DTO;
@@ -40,25 +41,44 @@ public class VoucherDetailService : IVoucherDetailService
         return ApiResponse<VoucherDetailResponse>.Ok(Map(item));
     }
 
-    public async Task<ApiResponse<string>> CreateAsync(CreateVoucherDetailRequest request)
+    public async Task<ApiResponse<List<VoucherDetailResponse>>> CreateAsync(CreateVoucherDetailRequest request)
     {
         List<int> voucherIds = request.VoucherIds.Distinct().ToList();
 
+        List<VoucherDetailResponse> result = new List<VoucherDetailResponse>();
+
         var now = DateTime.UtcNow;
+
+        decimal totalDiscountAmount = 0;
 
         foreach (var voucherId in voucherIds)
         {
             var voucher = await _voucherRepository.GetByIdAsync(voucherId);
             if(voucher == null)
             {
-                return ApiResponse<string>.Error($"Voucher {voucherId} does not exist", 400, null);
+                return ApiResponse<List<VoucherDetailResponse>>.Error($"Voucher {voucherId} does not exist", 400, null);
             }
             var error = ValidateSingleVoucher(voucher, request.totalAmountOrder, now);
             if (error != null)
             {
-                return ApiResponse<string>.Error(error, 400);
+                return ApiResponse<List<VoucherDetailResponse>>.Error(error, 400);
             }
             var discountAmount = CalculateDiscountAmount(voucher, request.totalAmountOrder);
+            var remainingAmount = request.totalAmountOrder - totalDiscountAmount;
+
+            if (remainingAmount < 0)
+            {
+                return ApiResponse<List<VoucherDetailResponse>>.Error(
+                    "Total discount amount has exceeded the total order amount",
+                    400
+                );
+            }
+
+            // không cho voucher hiện tại làm tổng discount vượt quá totalAmountOrder
+            if (discountAmount > remainingAmount)
+            {
+                discountAmount = remainingAmount;
+            }
 
             var voucherDetail = new VoucherDetail
             {
@@ -68,13 +88,28 @@ public class VoucherDetailService : IVoucherDetailService
                 AppliedDate = DateTime.UtcNow
             };
 
-            await _voucherDetailRepository.CreateAsync(voucherDetail);
+            var created = await _voucherDetailRepository.CreateAsync(voucherDetail);
+
+            var response = new VoucherDetailResponse
+            {
+                VoucherDetailId = created.VoucherDetailId,
+                OrderId = created.OrderId,
+                VoucherCode = created.Voucher.VoucherCode,
+                DiscountAmount = created.DiscountAmount,
+                VoucherId = created.VoucherId,
+                AppliedDate = created.AppliedDate
+            };
+
+            result.Add(response);
+            totalDiscountAmount += discountAmount;
 
             voucher.CurrentUsage += 1;
             await _voucherRepository.UpdateAsync(voucher);
         }
 
-        return ApiResponse<string>.Ok(null, "Apply voucher ids successfully", 201);
+     
+
+        return ApiResponse<List<VoucherDetailResponse>>.Ok(result, "Apply voucher ids successfully", 201);
     }
 
     private string? ValidateSingleVoucher(Voucher voucher, decimal totalAmountOrder, DateTime now)

@@ -6,10 +6,11 @@ namespace OrderService.Service
 {
     public interface IOrderService
     {
-        Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request, string accountUsername);
-        Task<ApiResponse<OrderDTO>> GetOrderByIdAsync(int orderId);
-        Task<ApiResponse<OrderDTO>> GetOrderByNumberAsync(string orderNumber);
-        Task<ApiResponse<OrderDTO>> ConfirmPaymentAsync(int orderId);
-        Task<ApiResponse<OrderDTO>> ProcessVnpayIpnAsync(string orderNumber, bool paymentSuccess, string vnpTransactionNo);
+
+        Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request, string accUsername);
+        //Task<ApiResponse<List<OrderDTO>>> GetAllOrdersAsync();
+        //Task<ApiResponse<OrderDTO>> GetOrderByIdAsync(int orderId);
+        //Task<ApiResponse<OrderDTO>> CancelOrderAsync(int orderId, string? cancelReason);
+
     }
 }

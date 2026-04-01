@@ -1,13 +1,15 @@
+using OrderService.Model;
+using OrderService.Model.Entities;
 using OrderService.Repository;
 using OrderService.Service.DTO;
 using OrderService.Service.DTO.Request;
 using OrderService.Service.DTO.Response;
 using OrderService.Service.HttpClients;
-using OrderService.Model.Entities;
+
 using OrderService.Service.Saga.Orchestator;
+using OrderService.Service.Saga.Orchestator.Context;
 using OrderService.Service.Saga.Orchestator.Steps;
-using Microsoft.EntityFrameworkCore;
-using OrderService.Model.DBContext;
+
 
 namespace OrderService.Service.Implementor
 {
@@ -16,38 +18,52 @@ namespace OrderService.Service.Implementor
         private readonly IOrderRepo _orderRepo;
         private readonly ITransactionRepo _transactionRepo;
         private readonly IProductHttpClient _productHttpClient;
-        private readonly OrderMgmtFfmContext _context;
 
-        public OrderService(IOrderRepo orderRepo, ITransactionRepo transactionRepo, IProductHttpClient productHttpClient, OrderMgmtFfmContext context)
+        private readonly IVoucherHttpClient _voucherHttpClient;
+
+        public OrderService(IOrderRepo orderRepo, IProductHttpClient productHttpClient, IVoucherHttpClient voucherHttpClient)
+
         {
             _orderRepo = orderRepo;
             _transactionRepo = transactionRepo;
             _productHttpClient = productHttpClient;
-            _context = context;
+            _voucherHttpClient = voucherHttpClient;
         }
 
-        public async Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request, string accountUsername)
+        public async Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request, string accUsername)
         {
             try
             {
-                var saga = new SagaOrchestrator()
-                    .AddStep(new CreateOrderStep(request, _orderRepo, _productHttpClient, accountUsername))
-                    .AddStep(new CreateTransactionStep(_transactionRepo));
 
-                var sagaContext = await saga.ExecuteAsync();
+                if (request == null)
+                {
+                    return ApiResponse<OrderDTO>.Error(null, "Request must not be null", 400);
+                }
 
-                var order = await _context.Orders
-                    .Include(o => o.OrderDetails)
-                    .Include(o => o.Transactions)
-                    .FirstOrDefaultAsync(o => o.OrderId == sagaContext.OrderId);
+                if (request.Items == null || !request.Items.Any())
+                {
+                    return ApiResponse<OrderDTO>.Error(null, "Order must have at least one item", 400);
+                }
 
-                return ApiResponse<OrderDTO>.Ok(MapToDTO(order!), "Order created successfully", 201);
+                var context = new SagaContext();
+
+                var orchestrator = new SagaOrchestrator()
+
+              .AddStep(new CreateOrderStep(_orderRepo, _productHttpClient, request, accUsername))
+              .AddStep(new ApplyVoucherDetailStep(_voucherHttpClient, _orderRepo));
+
+                try
+                {
+                    await orchestrator.ExecuteAsync(context);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return ApiResponse<OrderDTO>.Error(null, $"{ex.Message}", 400);
+                }
+
+                return ApiResponse<OrderDTO>.Ok(null, "Order created successfully", 201);
             }
-            catch (InvalidOperationException ex)
-            {
-                return ApiResponse<OrderDTO>.Error(null, ex.Message, 400);
-            }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return ApiResponse<OrderDTO>.Error(null, ex.Message, 500);
             }

@@ -7,13 +7,11 @@ public partial class Order
 {
     public int OrderId { get; set; }
 
-    public string AccountUsername { get; set; } = null!;
+    public string? AccountUsername { get; set; } = null!;
 
     public int? SubscriptionId { get; set; }
 
     public string OrderNumber { get; set; } = null!;
-
-    public DateTime? OrderDate { get; set; }
 
     public string? Status { get; set; }
 

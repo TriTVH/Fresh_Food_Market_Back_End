@@ -25,11 +25,7 @@ namespace OrderService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
         {
-            var username = GetUsername();
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized(new { message = "Unauthorized" });
-
-            var response = await _orderService.CreateOrderAsync(request, username);
+            var response = await _orderService.CreateOrderAsync(request, GetUsername());
             return StatusCode(response.StatusCode, response);
         }
 

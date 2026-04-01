@@ -6,7 +6,7 @@ namespace OrderService.Repository
     {
         Task<Order> CreateAsync(Order order);
         Task<Order?> GetByIdAsync(int orderId);
-        Task<Order?> GetByOrderNumberAsync(string orderNumber);
         Task UpdateAsync(Order order);
+        Task DeleteAsync(Order order);
     }
 }
