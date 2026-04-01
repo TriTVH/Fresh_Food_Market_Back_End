@@ -58,10 +58,12 @@ public partial class OrderMgmtFfmContext : DbContext
 
             entity.HasIndex(e => e.OrderNumber, "UQ__order__730E34DF5ECDF696").IsUnique();
 
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.OrderId)
+            .ValueGeneratedOnAdd()
+            .HasColumnName("order_id");
             entity.Property(e => e.AccountUsername)
                 .HasMaxLength(50)
-                .HasColumnName("account_email");
+                .HasColumnName("account_username");
             entity.Property(e => e.CancelReason).HasColumnName("cancel_reason");
             entity.Property(e => e.CancelledDate).HasColumnName("cancelled_date");
             entity.Property(e => e.ConfirmedDate).HasColumnName("confirmed_date");
@@ -73,9 +75,7 @@ public partial class OrderMgmtFfmContext : DbContext
                 .HasDefaultValue(0m)
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("discount_amount");
-            entity.Property(e => e.OrderDate)
-                .HasDefaultValueSql("(sysdatetime())")
-                .HasColumnName("order_date");
+         
             entity.Property(e => e.OrderNumber)
                 .HasMaxLength(50)
                 .IsUnicode(false)

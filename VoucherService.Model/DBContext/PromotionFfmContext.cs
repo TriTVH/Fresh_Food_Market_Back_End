@@ -98,9 +98,14 @@ public partial class PromotionFfmContext : DbContext
 
             entity.Property(e => e.VoucherDetailId).HasColumnName("voucher_detail_id");
             entity.Property(e => e.AppliedDate).HasColumnName("applied_date");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("status");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
-            entity.Property(e => e.DiscountAmount).HasColumnName("discount_amount")
+            entity.Property(e => e.DiscountAmount)
+            .HasColumnName("discount_amount")
             .HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Voucher).WithMany(p => p.VoucherDetails)

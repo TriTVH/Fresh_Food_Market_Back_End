@@ -22,12 +22,14 @@ namespace OrderService.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
-        //{
-        //    var response = await _orderService.CreateOrderAsync(request);
-        //    return StatusCode(response.StatusCode, response);
-        //}
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateOrderModel request)
+        {
+
+
+            var response = await _orderService.CreateOrderAsync(request, GetUsername());
+            return StatusCode(response.StatusCode, response);
+        }
 
         //[HttpGet]
         //public async Task<IActionResult> GetAll()
