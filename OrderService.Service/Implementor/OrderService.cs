@@ -1,10 +1,13 @@
+using OrderService.Model;
+using OrderService.Model.Entities;
 using OrderService.Repository;
 using OrderService.Service.DTO;
 using OrderService.Service.DTO.Request;
 using OrderService.Service.DTO.Response;
 using OrderService.Service.HttpClients;
-using OrderService.Model;
-using OrderService.Model.Entities;
+using OrderService.Service.Saga.Orchestator;
+using OrderService.Service.Saga.Orchestator.Context;
+using OrderService.Service.Saga.Orchestator.Steps;
 
 namespace OrderService.Service.Implementor
 {
@@ -12,24 +15,47 @@ namespace OrderService.Service.Implementor
     {
         private readonly IOrderRepo _orderRepo;
         private readonly IProductHttpClient _productHttpClient;
+        private readonly IVoucherHttpClient _voucherHttpClient;
 
-        public OrderService(IOrderRepo orderRepo, IProductHttpClient productHttpClient)
+        public OrderService(IOrderRepo orderRepo, IProductHttpClient productHttpClient, IVoucherHttpClient voucherHttpClient)
         {
             _orderRepo = orderRepo;
             _productHttpClient = productHttpClient;
+            _voucherHttpClient = voucherHttpClient;
         }
 
-        public async Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request)
+        public async Task<ApiResponse<OrderDTO>> CreateOrderAsync(CreateOrderModel request, string accUsername)
         {
             try
             {
-                //var saga = new CreateOrder(_orderRepo, _productHttpClient);
-                //var result = await saga.ExecuteAsync(request);
+
+                if (request == null)
+                {
+                    return ApiResponse<OrderDTO>.Error(null, "Request must not be null", 400);
+                }
+
+                if (request.Items == null || !request.Items.Any())
+                {
+                    return ApiResponse<OrderDTO>.Error(null, "Order must have at least one item", 400);
+                }
+
+                var context = new SagaContext();
+
+                var orchestrator = new SagaOrchestrator()
+
+              .AddStep(new CreateOrderStep(_orderRepo, _productHttpClient, request, accUsername))
+              .AddStep(new ApplyVoucherDetailStep(_voucherHttpClient, _orderRepo));
+
+                try
+                {
+                    await orchestrator.ExecuteAsync(context);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return ApiResponse<OrderDTO>.Error(null, $"{ex.Message}", 400);
+                }
+
                 return ApiResponse<OrderDTO>.Ok(null, "Order created successfully", 201);
-            }
-            catch(InvalidOperationException ex)
-            {
-                return ApiResponse<OrderDTO>.Error(null, ex.Message, 400);
             }
             catch(Exception ex)
             {

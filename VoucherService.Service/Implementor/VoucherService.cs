@@ -113,8 +113,8 @@ public class VoucherService : IVoucherService
         {
             var discountMin = request.DiscountPercentage.Value * request.ValidFrom.Value / 100m;
 
-            if (discountMin >= request.DiscountMax.Value)
-                return "discount_percentage * valid_from / 100 must be less than discount_max";
+            if (discountMin > request.DiscountMax.Value)
+                return "Maximum discount must be greater than or equal to the discount calculated from the minimum order value.";
         }
 
         return null;

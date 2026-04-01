@@ -17,7 +17,6 @@ public class VoucherDetailController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> GetAll()
     {
         var response = await _service.GetAllAsync();
@@ -25,7 +24,6 @@ public class VoucherDetailController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var response = await _service.GetByIdAsync(id);
@@ -33,7 +31,6 @@ public class VoucherDetailController : ControllerBase
     }
 
     [HttpGet("voucher/{voucherId:int}")]
-    [Authorize]
     public async Task<IActionResult> GetByVoucherId([FromRoute] int voucherId)
     {
         var response = await _service.GetByVoucherIdAsync(voucherId);
@@ -41,7 +38,6 @@ public class VoucherDetailController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateVoucherDetailRequest request)
     {
         if (!ModelState.IsValid)

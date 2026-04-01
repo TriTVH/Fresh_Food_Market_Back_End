@@ -34,6 +34,11 @@ builder.Services.AddHttpClient<IProductHttpClient, ProductHttpClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductCatalogService"]!);
 });
 
+builder.Services.AddHttpClient<IVoucherHttpClient, VoucherHttpClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:VoucherService"]!);
+});
+
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderService, OrderService.Service.Implementor.OrderService>();
 
