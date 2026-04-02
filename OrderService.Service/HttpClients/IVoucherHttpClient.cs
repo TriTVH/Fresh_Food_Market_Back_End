@@ -11,5 +11,6 @@ namespace OrderService.Service.HttpClients
     public interface IVoucherHttpClient
     {
         Task<List<VoucherDetailResponse>> ApplyVoucherDetailAsync(CreateVoucherDetailRequest request);
+        Task<bool> UnApplyVoucherDetailAsync(int orderId);
     }
 }

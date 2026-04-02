@@ -48,4 +48,16 @@ public class VoucherDetailRepository : IVoucherDetailRepository
     {
         return _context.SaveChangesAsync();
     }
+    public async Task UpdateRangeAsync(List<VoucherDetail> voucherDetails)
+    {
+        _context.VoucherDetails.UpdateRange(voucherDetails);
+        await _context.SaveChangesAsync();
+    }
+
+    public Task<List<VoucherDetail>> GetByOrderIdAsync(int orderId)
+    {
+       return _context.VoucherDetails
+            .Where(x => x.OrderId == orderId)
+            .ToListAsync();
+    }
 }

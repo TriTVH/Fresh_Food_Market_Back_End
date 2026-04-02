@@ -244,4 +244,13 @@ public class VoucherService : IVoucherService
             UpdatedDate = voucher.UpdatedDate
         };
     }
+
+    public async Task<ApiResponse<List<VoucherResponse>>> GetAllByOrderIdAsync(int orderId)
+    {
+        var items = await _voucherRepository.GetAllByOrderIdAsync(orderId);
+        var result = items.Select(MapToResponse).ToList();
+        return ApiResponse<List<VoucherResponse>>.Ok(result);
+    }
+
+
 }

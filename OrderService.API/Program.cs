@@ -44,8 +44,6 @@ builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<IOrderService, OrderService.Service.Implementor.OrderService>();
 
-builder.Services.Configure<VnpayConfig>(builder.Configuration.GetSection("Vnpay"));
-builder.Services.AddScoped<IVnpayService, VnpayService>();
 
 builder.Services.AddJwtAuthentication();
 

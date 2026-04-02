@@ -56,7 +56,9 @@ namespace OrderService.Service.Saga.Orchestator.Steps
             order.TotalAmount = order.TotalAmount - (order.DiscountAmount ?? 0);
 
             await _orderRepo.UpdateAsync(order);
-        
+
+            sagaContext.TotalAmountOrder = order.TotalAmount;
+
         }
     }
 }

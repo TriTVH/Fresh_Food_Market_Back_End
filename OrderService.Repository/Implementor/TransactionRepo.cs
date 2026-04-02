@@ -20,6 +20,12 @@ namespace OrderService.Repository.Implementor
             return transaction;
         }
 
+        public async Task DeleteAsync(Transaction transaction)
+        {
+            _context.Transactions.Remove(transaction);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Transaction?> GetByIdAsync(int id)
         {
             return await _context.Transactions.FirstOrDefaultAsync(t => t.Id == id);

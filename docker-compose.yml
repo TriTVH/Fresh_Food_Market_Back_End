@@ -1,60 +1,121 @@
 services:
   ocelotapigateway:
-    image: ffm-ocelotapigateway
+    image: huatri/ffm-ocelotapigateway
     build:
       context: .
       dockerfile: OcelotApiGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5000
+    depends_on:
+      - accservice.api
+      - productcatalogservice.api
+      - blogservice.api
+      - inventoryservice.api
+      - orderservice.api
+    ports:
+      - "5000:5000"
+    networks:
+      - ffm-network
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ffm-network
+    restart: always
 
   accservice.api:
-    image: ffm-accserviceapi
+    image: huatri/ffm-accserviceapi
     build:
       context: .
       dockerfile: AccService.API/Dockerfile
-
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - ffm-network
+    restart: always
 
   productcatalogservice.api:
-    image: ffm-productcatalogserviceapi
+    image: huatri/ffm-productcatalogserviceapi
     build:
       context: .
       dockerfile: ProductCatalogService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7000
+    ports:
+      - "7000:7000"
+    networks:
+      - ffm-network
+    restart: always
+
   blogservice.api:
-    image: ffm-blogserviceapi
+    image: huatri/ffm-blogserviceapi
     build:
       context: .
       dockerfile: BlogService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7200
+      - ExternalServices__ProductCatalogBaseUrl=http://productcatalogservice.api:7000/
+    ports:
+      - "7200:7200"
+    networks:
+      - ffm-network
+    restart: always
 
   inventoryservice.api:
-    image: ffm-inventoryserviceapi
+    image: huatri/ffm-inventoryserviceapi
     build:
       context: .
       dockerfile: InventoryService.API/Dockerfile
-
-  orderservice_redis.api:
-    image: ffm-orderservice_redisapi
-    build:
-      context: .
-      dockerfile: OrderService_Redis.API/Dockerfile
-
-  inventoryservice_redis.api:
-    image: ffm-inventoryservice_redisapi
-    build:
-      context: .
-      dockerfile: InventoryService_Redis.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7300
+    ports:
+      - "7300:7300"
+    networks:
+      - ffm-network
+    restart: always
 
   voucherservice.api:
-    image: ffm-voucherserviceapi
+    image: huatri/ffm-voucherserviceapi
     build:
       context: .
       dockerfile: VoucherService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7400
+    ports:
+      - "7400:7400"
+    networks:
+      - ffm-network
+    restart: always
 
   orderservice.api:
-    image: ffm-orderserviceapi
+    image: huatri/ffm-orderserviceapi
     build:
       context: .
       dockerfile: OrderService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7700
+    ports:
+      - "7700:7700"
+    networks:
+      - ffm-network
+    restart: always
 
 volumes:
-   rabbitmq_data:
+  rabbitmq_data:
 
-
-
+networks:
+  ffm-network:
+    driver: bridge

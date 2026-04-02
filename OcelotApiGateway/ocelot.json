@@ -242,70 +242,6 @@
       ]
     },
     {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/orders/{everything}",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/orders",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/orders",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/sagas",
-      "UpstreamHttpMethod": [ "GET" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/sagas",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
-      "SwaggerKey": "inventory-service-redis",
-      "UpstreamPathTemplate": "/inventory/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/inventory/{everything}",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "inventoryservice_redis.api",
-          "Port": 7600
-        }
-      ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      }
-    },
-    {
       "SwaggerKey": "order-service",
       "UpstreamPathTemplate": "/order/{everything}",
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
@@ -338,59 +274,20 @@
       }
     },
     {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/payment/vnpay/create",
-      "UpstreamHttpMethod": [ "POST" ],
+      "SwaggerKey": "order-service",
+      "UpstreamPathTemplate": "/payment/vnpay/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/payment/vnpay/create",
+      "DownstreamPathTemplate": "/api/payment/vnpay/{everything}",
       "DownstreamHostAndPorts": [
         {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
+          "Host": "orderservice.api",
+          "Port": 7700
         }
       ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
-    },
-    {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/payment/vnpay/ipn",
-      "UpstreamHttpMethod": [ "GET" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/payment/vnpay/ipn",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ]
-    },
-    {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/payment/vnpay/return",
-      "UpstreamHttpMethod": [ "GET" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/payment/vnpay/return",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ]
-    },
-    {
-      "SwaggerKey": "order-service-redis",
-      "UpstreamPathTemplate": "/payment/vnpay/dev/simulate",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DownstreamScheme": "http",
-      "DownstreamPathTemplate": "/payment/vnpay/dev/simulate",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "orderservice_redis.api",
-          "Port": 7500
-        }
-      ]
     }
   ],
   "SwaggerEndPoints": [
@@ -453,26 +350,6 @@
           "Name": "Order Service",
           "Version": "v1",
           "Url": "http://orderservice.api:7700/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "order-service-redis",
-      "Config": [
-        {
-          "Name": "Order Service (Redis)",
-          "Version": "v1",
-          "Url": "http://orderservice_redis.api:7500/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "inventory-service-redis",
-      "Config": [
-        {
-          "Name": "Inventory Service (Redis)",
-          "Version": "v1",
-          "Url": "http://inventoryservice_redis.api:7600/swagger/v1/swagger.json"
         }
       ]
     }

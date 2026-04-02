@@ -2,7 +2,7 @@ namespace OrderService.Service.DTO.Request
 {
     public class VnpayCreatePaymentRequest
     {
-        public string OrderNumber { get; set; } = default!;
+        public decimal TotalAmount { get; set; } = default!;
     }
 
     public class VnpaySimulateIpnRequest

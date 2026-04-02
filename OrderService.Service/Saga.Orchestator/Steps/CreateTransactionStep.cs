@@ -25,26 +25,24 @@ namespace OrderService.Service.Saga.Orchestator.Steps
             {
                 Type = "PAYMENT",
                 Direction = "IN",
-                Amount = sagaContext.TotalAmount,
                 Status = "PENDING",
+                Amount = sagaContext.TotalAmountOrder.Value,
                 OrderId = sagaContext.OrderId
             };
 
             var created = await _transactionRepo.CreateAsync(transaction);
+            
             sagaContext.TransactionId = created.Id;
         }
 
         public async Task CompensateAsync(SagaContext sagaContext)
         {
-            if (sagaContext.TransactionId > 0)
+           var transaction = await _transactionRepo.GetByIdAsync(sagaContext.TransactionId);
+            if (transaction == null)
             {
-                var transaction = await _transactionRepo.GetByIdAsync(sagaContext.TransactionId);
-                if (transaction != null)
-                {
-                    transaction.Status = "CANCELLED";
-                    await _transactionRepo.UpdateAsync(transaction);
-                }
+                return;
             }
+            await _transactionRepo.DeleteAsync(transaction);
         }
     }
 }

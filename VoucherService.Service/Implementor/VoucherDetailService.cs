@@ -66,18 +66,15 @@ public class VoucherDetailService : IVoucherDetailService
             var discountAmount = CalculateDiscountAmount(voucher, request.totalAmountOrder);
             var remainingAmount = request.totalAmountOrder - totalDiscountAmount;
 
-            if (remainingAmount < 0)
-            {
-                return ApiResponse<List<VoucherDetailResponse>>.Error(
-                    "Total discount amount has exceeded the total order amount",
-                    400
-                );
-            }
+ 
 
             // không cho voucher hiện tại làm tổng discount vượt quá totalAmountOrder
             if (discountAmount > remainingAmount)
             {
-                discountAmount = remainingAmount;
+                return ApiResponse<List<VoucherDetailResponse>>.Error(
+        "Voucher discount cannot exceed the remaining order amount.",
+        400
+    );
             }
 
             var voucherDetail = new VoucherDetail
@@ -85,6 +82,7 @@ public class VoucherDetailService : IVoucherDetailService
                 OrderId = request.OrderId,
                 VoucherId = voucher.VoucherId,
                 DiscountAmount = discountAmount,
+                Status = "APPLIED",
                 AppliedDate = DateTime.UtcNow
             };
 
@@ -122,6 +120,7 @@ public class VoucherDetailService : IVoucherDetailService
             return $"Voucher {voucher.VoucherCode} has reached max usage";
         }
         var type = voucher.TypeDiscountTime.Trim().ToUpperInvariant();
+
         if (type == "FIXED")
         {
             if (now > voucher.ToDate.Value)
@@ -145,6 +144,44 @@ public class VoucherDetailService : IVoucherDetailService
         }
 
         return Math.Round(discount, 2);
+    }
+    public async Task<ApiResponse<bool>> UnAppliedVouchers(int orderId)
+    {
+        var voucherDetails = await _voucherDetailRepository.GetByOrderIdAsync(orderId);
+
+        if (voucherDetails == null || !voucherDetails.Any())
+        {
+            return ApiResponse<bool>.Ok(true);
+        }
+
+        // lấy tất cả voucherId cần update
+        var voucherIds = voucherDetails
+            .Select(v => v.VoucherId)
+            .Distinct()
+            .ToList();
+
+        var vouchers = await _voucherRepository.GetByIdsAsync(voucherIds);
+
+        foreach (var voucherDetail in voucherDetails)
+        {
+            // chỉ xử lý nếu đang APPLIED
+            if (voucherDetail.Status == "APPLIED")
+            {
+                voucherDetail.Status = "INVOKED";
+
+                // giảm usage
+                var voucher = vouchers.FirstOrDefault(v => v.VoucherId == voucherDetail.VoucherId);
+
+                if (voucher != null && voucher.CurrentUsage.HasValue && voucher.CurrentUsage > 0)
+                {
+                    voucher.CurrentUsage--;
+                }
+            }
+        }
+        await _voucherDetailRepository.UpdateRangeAsync(voucherDetails);
+        await _voucherRepository.UpdateRangeAsync(vouchers);
+
+        return ApiResponse<bool>.Ok(true, "Vouchers have been un-applied successfully");
     }
     private VoucherDetailResponse Map(VoucherDetail x)
     {

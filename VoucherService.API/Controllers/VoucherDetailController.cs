@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using VoucherService.Service;
 using VoucherService.Service.DTO.Request;
 
@@ -34,6 +35,13 @@ public class VoucherDetailController : ControllerBase
     public async Task<IActionResult> GetByVoucherId([FromRoute] int voucherId)
     {
         var response = await _service.GetByVoucherIdAsync(voucherId);
+        return StatusCode(response.StatusCode, response);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete([Required] [FromQuery] int orderId)
+    {
+        var response = await _service.UnAppliedVouchers(orderId);
         return StatusCode(response.StatusCode, response);
     }
 

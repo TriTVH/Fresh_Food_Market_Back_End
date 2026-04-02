@@ -38,7 +38,7 @@ namespace OrderService.Service.Saga.Orchestator
 
                     _executed.Add(step);
                 }
-                catch
+                catch (Exception ex)
                 {
                     Console.WriteLine($"Step {step.GetType().Name} failed: {ex.Message}");
 
@@ -47,7 +47,6 @@ namespace OrderService.Service.Saga.Orchestator
                     throw;
                 }
             }
-            return _context;
         }
 
         private async Task CompensateAsync(SagaContext sagaContext)

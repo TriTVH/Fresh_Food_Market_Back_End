@@ -46,11 +46,10 @@ namespace OrderService.Service.Saga.Orchestator.Steps
                 ShippingName = _request.ShippingName,
                 ShippingPhone = _request.ShippingPhone,
                 ShippingAddress = _request.ShippingAddress,
-                ShippingFee = _request.ShippingFee,
                 PaymentMethod = _request.PaymentMethod,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
-                
+
                 OrderDetails = new List<OrderDetail>()
             };
 
@@ -64,7 +63,7 @@ namespace OrderService.Service.Saga.Orchestator.Steps
                 {
                     throw new InvalidOperationException($"Product with ID {_request.Items[i].ProductId} not found.");
                 }
-                var unitPrice = product.PriceSell; // đổi lại đúng field giá bên product DTO của bạn
+                var unitPrice = product.PriceSell - _request.Items[i].Discount; 
                 var lineTotal = unitPrice * _request.Items[i].Quantity;
                 order.OrderDetails.Add(new OrderDetail
                 {
@@ -72,7 +71,7 @@ namespace OrderService.Service.Saga.Orchestator.Steps
                     Quantity = _request.Items[i].Quantity,
                     DiscountPerItem = _request.Items[i].Discount,
                     Subtotal = lineTotal,
-                    Price = unitPrice,
+                    Price = product.PriceSell,
                     ProductName = product.ProductName,
                     CreatedAt = DateTime.UtcNow
                 });
@@ -81,21 +80,18 @@ namespace OrderService.Service.Saga.Orchestator.Steps
 
             order.Subtotal = subTotal;
             order.DiscountAmount = 0;
-
-            order.TotalAmount = subTotal + (order.ShippingFee ?? 0);
-            var created = await _orderRepo.CreateAsync(order);
-
+            order.ShippingFee = _request.ShippingFee;
+            order.TotalAmount = subTotal + _request.ShippingFee.Value;
 
             var created = await _orderRepo.CreateAsync(order);
+
             if (created == null)
             {
                 throw new InvalidOperationException("Failed to create order.");
             }
-
             sagaContext.OrderId = created.OrderId;
-            sagaContext.TotalAmount = created.TotalAmount;
             sagaContext.VoucherIds = _request.VoucherIds;
-            sagaContext.TotalAmountOrder = created.Subtotal;
+            sagaContext.TotalAmountOrder = created.TotalAmount;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace JwtConfiguration
 {
     public static class JwtExtension
     {
-        public const string SecurityKey = "nch5Zrqtc8yyupxizgBCXJZIOVJhQoihklTE/IFnsGo=\r\n";
+        public const string SecurityKey = "nch5Zrqtc8yyupxizgBCXJZIOVJhQoihklTE/IFnsGo=";
         public const string Issuer = "https://localhost:5002";
 
         public static void AddJwtAuthentication(this IServiceCollection services)

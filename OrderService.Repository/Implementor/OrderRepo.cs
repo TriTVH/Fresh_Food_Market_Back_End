@@ -27,17 +27,36 @@ namespace OrderService.Repository.Implementor
             await _context.SaveChangesAsync();
         }
 
+        public Task<List<Order>> GetByUsernameAsync(string accUsername)
+        {
+            return _context.Orders
+                .Where(o => o.AccountUsername == accUsername)
+                .Include(o => o.OrderDetails)
+                .Include(o => o.Transactions)
+                .ToListAsync();
+        }
+
         public async Task<Order?> GetByIdAsync(int orderId)
         {
             return await _context.Orders
                 .Include(o => o.OrderDetails)
+                .Include(o => o.Transactions)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
 
-        public async Task UpdateAsync(Order order)
+        public async Task<Order?> UpdateAsync(Order order)
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
+            return order;
+        }
+
+        public Task<List<Order>> GetAllOrders()
+        {
+            return _context.Orders
+            .Include(o => o.OrderDetails)
+            .Include(o => o.Transactions)
+            .ToListAsync();
         }
     }
 }

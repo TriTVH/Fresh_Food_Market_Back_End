@@ -24,6 +24,14 @@ public class VoucherController : ControllerBase
         return StatusCode(response.StatusCode, response);
     }
 
+    //[HttpGet ]
+    //[Authorize]
+    //public async Task<IActionResult> GetAllByOrderId([FromQuery] int orderId)
+    //{
+    //    var response = await _voucherService.GetAllByOrderIdAsync(orderId);
+    //    return StatusCode(response.StatusCode, response);
+    //}
+
     [HttpGet("{id:int}")]
     [Authorize]
     public async Task<IActionResult> GetById([FromRoute] int id)

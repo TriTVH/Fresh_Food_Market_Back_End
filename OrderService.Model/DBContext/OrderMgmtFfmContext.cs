@@ -141,11 +141,17 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.Property(e => e.Price)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("price");
+            entity.Property(e => e.RefundAmount)
+               .HasColumnType("decimal(15, 2)")
+               .HasColumnName("refund_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(100)
                 .HasColumnName("product_name");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.MissingQuantity).HasColumnName("missing_quantity");
+            entity.Property(e => e.RefundQuantity).HasColumnName("refund_quantity");
+
             entity.Property(e => e.Subtotal)
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("subtotal");

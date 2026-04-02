@@ -33,5 +33,18 @@ namespace OrderService.Service.HttpClients
 
             return apiResponse?.Data;
         }
+        public async Task<bool> UnApplyVoucherDetailAsync(int orderId)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/voucher-detail?orderId={orderId}");
+
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException(apiResponse?.Message ?? "Failed to unapply voucher detail");
+            }
+
+            return apiResponse?.Data ?? false;
+        }
     }
 }
