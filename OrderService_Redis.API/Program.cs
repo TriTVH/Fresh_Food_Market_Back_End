@@ -76,8 +76,13 @@ app.MapPost("/orders", async (CreateOrderRequest request, OrderStore orderStore)
     });
 });
 
-app.MapGet("/orders", async (OrderStore orderStore) =>
+app.MapGet("/orders", async (string? userId, OrderStore orderStore) =>
 {
+    if (!string.IsNullOrWhiteSpace(userId))
+    {
+        var userOrders = await orderStore.GetByUserId(userId);
+        return Results.Ok(userOrders);
+    }
     var orders = await orderStore.GetAll();
     return Results.Ok(orders);
 });

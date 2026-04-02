@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OrderService.Service.Saga.Orchestator.Context;
 
 namespace OrderService.Service.Saga.Orchestator
 {
@@ -16,30 +17,30 @@ namespace OrderService.Service.Saga.Orchestator
             return this;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(SagaContext sagaContext)
         {
             foreach (var step in _steps)
             {
                 try
                 {
-                    await step.ExecuteAsync();
+                    await step.ExecuteAsync(sagaContext);
                     _executed.Add(step);
                 }
                 catch (Exception ex)
                 {
-                    await CompensateAsync();
+                    await CompensateAsync(sagaContext);
                     throw;
                 }
             }
         }
 
-        private async Task CompensateAsync()
+        private async Task CompensateAsync(SagaContext sagaContext)
         {
             foreach (var step in _executed.AsEnumerable().Reverse())
             {
                 try 
                 { 
-                    await step.CompensateAsync(); 
+                    await step.CompensateAsync(sagaContext); 
                 }
                 catch (Exception ex) 
                 { 

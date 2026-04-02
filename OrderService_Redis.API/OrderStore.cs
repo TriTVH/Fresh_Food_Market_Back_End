@@ -16,13 +16,14 @@ namespace OrderService_Redis.API
         }
 
             public async Task<OrderRecord> Create(CreateOrderRequest request)
-            {
-                var orderId = $"ORD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+        {
+            var orderId = $"ORD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
             var order = new OrderRecord
             {
                 OrderId = orderId,
                 OrderStatus = "PENDING",
+                UserId = request.UserId,
                 CreatedAtUtc = DateTime.UtcNow,
                 UpdatedAtUtc = DateTime.UtcNow,
                 Items = request.Items
@@ -31,22 +32,25 @@ namespace OrderService_Redis.API
             {
                 Id = orderId,
                 Status = "PENDING",
+                UserId = request.UserId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 OrderItems = request.Items.Select(item => new OrderItem
                 {
                     ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    Price = item.Price,
+                    SubTotal = item.Price * item.Quantity,
                     Quantity = item.Quantity,
                     CreatedAt = DateTime.UtcNow,
                 }).ToList()
             };
 
-                _orders[order.OrderId] = order;
-
-                 _context.Orders.Add(orderInDB);
-                 await  _context.SaveChangesAsync();
-                return order;
-            }
+            _orders[order.OrderId] = order;
+            _context.Orders.Add(orderInDB);
+            await _context.SaveChangesAsync();
+            return order;
+        }
 
         public async Task<OrderRecord?> Get(string orderId)
         {
@@ -56,11 +60,15 @@ namespace OrderService_Redis.API
                 {
                     OrderId = x.Id,
                     OrderStatus = x.Status,
+                    UserId = x.UserId,
                     CreatedAtUtc = x.CreatedAt,
                     UpdatedAtUtc = x.UpdatedAt,
                     Items = x.OrderItems.Select(i => new OrderItemDTO
                     {
                         ProductId = i.ProductId,
+                        ProductName = i.ProductName,
+                        Price = i.Price,
+                        SubTotal = i.SubTotal,
                         Quantity = i.Quantity,
                         CreatedAt = i.CreatedAt
                     }).ToList()
@@ -76,11 +84,40 @@ namespace OrderService_Redis.API
                 {
                     OrderId = x.Id,
                     OrderStatus = x.Status,
+                    UserId = x.UserId,
                     CreatedAtUtc = x.CreatedAt,
                     UpdatedAtUtc = x.UpdatedAt,
                     Items = x.OrderItems.Select(i => new OrderItemDTO
                     {
                         ProductId = i.ProductId,
+                        ProductName = i.ProductName,
+                        Price = i.Price,
+                        SubTotal = i.SubTotal,
+                        Quantity = i.Quantity,
+                        CreatedAt = i.CreatedAt
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<OrderRecord>> GetByUserId(string userId)
+        {
+            return await _context.Orders
+                .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new OrderRecord
+                {
+                    OrderId = x.Id,
+                    OrderStatus = x.Status,
+                    UserId = x.UserId,
+                    CreatedAtUtc = x.CreatedAt,
+                    UpdatedAtUtc = x.UpdatedAt,
+                    Items = x.OrderItems.Select(i => new OrderItemDTO
+                    {
+                        ProductId = i.ProductId,
+                        ProductName = i.ProductName,
+                        Price = i.Price,
+                        SubTotal = i.SubTotal,
                         Quantity = i.Quantity,
                         CreatedAt = i.CreatedAt
                     }).ToList()
@@ -135,7 +172,7 @@ namespace OrderService_Redis.API
         public class OrderRecord
         {
             public string OrderId { get; set; } = default!;
-    
+            public string? UserId { get; set; }
             public string OrderStatus { get; set; } = default!;
             public List<OrderItemDTO> Items { get; set; } = [];
             public DateTime CreatedAtUtc { get; set; }
@@ -144,6 +181,7 @@ namespace OrderService_Redis.API
 
     public sealed class CreateOrderRequest
     {
+        public string? UserId { get; set; }
         public List<OrderItemDTO> Items { get; set; } = [];
     }
 

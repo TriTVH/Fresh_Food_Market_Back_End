@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,35 +28,24 @@ public partial class OrderSerRedisContext : DbContext
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable("Order");
-
-            entity.Property(e => e.Id)
-                .HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasColumnName("status");
-            entity.Property(e => e.UpdatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("updated_at");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime").HasColumnName("created_at");
+            entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
+            entity.Property(e => e.UserId).HasMaxLength(100).HasColumnName("user_id").IsRequired(false);
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime").HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
             entity.ToTable("OrderItem");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("id");
-            entity.Property(e => e.ProductId)
-            .HasColumnName("product_id");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
+            entity.Property(e => e.Id).ValueGeneratedOnAdd().HasColumnName("id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ProductName).HasMaxLength(255).HasColumnName("product_name").IsRequired(false);
+            entity.Property(e => e.Price).HasColumnType("decimal(18,2)").HasColumnName("price");
+            entity.Property(e => e.SubTotal).HasColumnType("decimal(18,2)").HasColumnName("sub_total");
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime").HasColumnName("created_at");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
-
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
