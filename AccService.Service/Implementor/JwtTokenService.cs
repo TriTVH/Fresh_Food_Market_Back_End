@@ -89,6 +89,7 @@ namespace AccService.Service.Implementor
                 var claims = new List<Claim>
                 {
                   new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                  new Claim("username", user.Username),
                   new Claim("role", user.RoleId.ToString()),
                 };
                 var tokenOptions = new JwtSecurityToken(

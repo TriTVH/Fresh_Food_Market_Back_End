@@ -1,9 +1,11 @@
 ﻿using OrderService.Service.Saga.Orchestator.Context;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace OrderService.Service.Saga.Orchestator
 {
@@ -11,14 +13,18 @@ namespace OrderService.Service.Saga.Orchestator
     {
         private readonly List<ISagaStep> _steps = new();
         private readonly List<ISagaStep> _executed = new();
+
         
+
         public SagaOrchestrator AddStep(ISagaStep step)
         {
             _steps.Add(step);
             return this;
         }
 
+
         public async Task ExecuteAsync(SagaContext sagaContext)
+
         {
 
             _executed.Clear();
@@ -27,7 +33,9 @@ namespace OrderService.Service.Saga.Orchestator
             {
                 try
                 {
+
                     await step.ExecuteAsync(sagaContext);
+
                     _executed.Add(step);
                 }
                 catch (Exception ex)
@@ -47,6 +55,7 @@ namespace OrderService.Service.Saga.Orchestator
             {
                 try
                 {
+
                     await step.CompensateAsync(sagaContext);
                 }
                 catch (Exception ex)

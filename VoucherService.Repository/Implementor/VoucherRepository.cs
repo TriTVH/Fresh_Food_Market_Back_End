@@ -50,4 +50,26 @@ public class VoucherRepository : IVoucherRepository
         var affected = await _context.SaveChangesAsync();
         return affected > 0;
     }
+
+    public Task<List<Voucher>> GetAllByOrderIdAsync(int orderId)
+    {
+        return _context.Vouchers.
+             Include(v => v.VoucherDetails)
+            .Where(v => v.VoucherDetails.Any(d => d.OrderId == orderId))
+            .ToListAsync();
+    }
+
+    public async Task<List<Voucher>> GetByIdsAsync(List<int> ids)
+    {
+        return await _context.Vouchers
+            .Where(v => ids.Contains(v.VoucherId))
+            .ToListAsync();
+    }
+
+    public async Task UpdateRangeAsync(List<Voucher> vouchers)
+    {
+        _context.Vouchers.UpdateRange(vouchers);
+        await _context.SaveChangesAsync();
+    }
+
 }

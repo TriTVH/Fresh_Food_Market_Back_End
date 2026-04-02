@@ -12,6 +12,9 @@ public partial class OrderDetail
     public int OrderId { get; set; }
 
     public int Quantity { get; set; }
+    public int MissingQuantity { get; set; }
+    public int RefundQuantity { get; set; }
+    public decimal RefundAmount { get; set; }
 
     public decimal? DiscountPerItem { get; set; }
 

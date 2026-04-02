@@ -17,7 +17,6 @@ COPY ["InventoryService.Service/InventoryService.Service.csproj", "InventoryServ
 COPY ["InventoryService.Repository/InventoryService.Repository.csproj", "InventoryService.Repository/"]
 COPY ["InventoryService.Model/InventoryService.Model.csproj", "InventoryService.Model/"]
 COPY ["JwtConfiguration/JwtConfiguration.csproj", "JwtConfiguration/"]
-COPY ["RabbitMQ/RabbitMQ.csproj", "RabbitMQ/"]
 RUN dotnet restore "./InventoryService.API/InventoryService.API.csproj"
 COPY . .
 WORKDIR "/src/InventoryService.API"

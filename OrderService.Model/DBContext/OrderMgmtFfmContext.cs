@@ -24,9 +24,15 @@ public partial class OrderMgmtFfmContext : DbContext
 
     public virtual DbSet<SubscriptionTicket> SubscriptionTickets { get; set; }
 
+    public virtual DbSet<Transaction> Transactions { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=tcp:ffmser.database.windows.net,1433;Initial Catalog=order_mgmt_ffm;Persist Security Info=False;User ID=ffm_admin;Password=Server@1235;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Server=tcp:ffmser.database.windows.net,1433;Initial Catalog=order_mgmt_ffm;Persist Security Info=False;User ID=ffm_admin;Password=Server@1235;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,7 +81,6 @@ public partial class OrderMgmtFfmContext : DbContext
                 .HasDefaultValue(0m)
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("discount_amount");
-         
             entity.Property(e => e.OrderNumber)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -136,11 +141,17 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.Property(e => e.Price)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("price");
+            entity.Property(e => e.RefundAmount)
+               .HasColumnType("decimal(15, 2)")
+               .HasColumnName("refund_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(100)
                 .HasColumnName("product_name");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.MissingQuantity).HasColumnName("missing_quantity");
+            entity.Property(e => e.RefundQuantity).HasColumnName("refund_quantity");
+
             entity.Property(e => e.Subtotal)
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("subtotal");
@@ -177,6 +188,35 @@ public partial class OrderMgmtFfmContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetime())")
                 .HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.ToTable("transaction");
+
+            entity.HasKey(e => e.Id).HasName("PK_transaction");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("type");
+            entity.Property(e => e.Direction)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("direction");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(15, 2)")
+                .HasColumnName("amount");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("status");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("fk_transaction_order");
         });
 
         OnModelCreatingPartial(modelBuilder);

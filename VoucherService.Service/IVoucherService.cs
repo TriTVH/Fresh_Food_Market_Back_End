@@ -7,6 +7,7 @@ namespace VoucherService.Service;
 public interface IVoucherService
 {
     Task<ApiResponse<List<VoucherResponse>>> GetAllAsync();
+    Task<ApiResponse<List<VoucherResponse>>> GetAllByOrderIdAsync(int orderId);
     Task<ApiResponse<VoucherResponse>> GetByIdAsync(int id);
     Task<ApiResponse<VoucherResponse>> CreateAsync(CreateVoucherRequest request);
     Task<ApiResponse<VoucherResponse>> UpdateAsync(UpdateVoucherRequest request);

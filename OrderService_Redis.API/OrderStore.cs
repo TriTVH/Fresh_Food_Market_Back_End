@@ -23,6 +23,7 @@ namespace OrderService_Redis.API
             {
                 OrderId = orderId,
                 OrderStatus = "PENDING",
+                TotalAmount = request.TotalAmount,
                 CreatedAtUtc = DateTime.UtcNow,
                 UpdatedAtUtc = DateTime.UtcNow,
                 Items = request.Items
@@ -31,6 +32,7 @@ namespace OrderService_Redis.API
             {
                 Id = orderId,
                 Status = "PENDING",
+                TotalAmount = request.TotalAmount,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 OrderItems = request.Items.Select(item => new OrderItem
@@ -56,6 +58,7 @@ namespace OrderService_Redis.API
                 {
                     OrderId = x.Id,
                     OrderStatus = x.Status,
+                    TotalAmount = x.TotalAmount,
                     CreatedAtUtc = x.CreatedAt,
                     UpdatedAtUtc = x.UpdatedAt,
                     Items = x.OrderItems.Select(i => new OrderItemDTO
@@ -76,6 +79,7 @@ namespace OrderService_Redis.API
                 {
                     OrderId = x.Id,
                     OrderStatus = x.Status,
+                    TotalAmount = x.TotalAmount,
                     CreatedAtUtc = x.CreatedAt,
                     UpdatedAtUtc = x.UpdatedAt,
                     Items = x.OrderItems.Select(i => new OrderItemDTO
@@ -135,8 +139,9 @@ namespace OrderService_Redis.API
         public class OrderRecord
         {
             public string OrderId { get; set; } = default!;
-    
+
             public string OrderStatus { get; set; } = default!;
+            public decimal TotalAmount { get; set; }
             public List<OrderItemDTO> Items { get; set; } = [];
             public DateTime CreatedAtUtc { get; set; }
             public DateTime? UpdatedAtUtc { get; set; }
@@ -144,6 +149,7 @@ namespace OrderService_Redis.API
 
     public sealed class CreateOrderRequest
     {
+        public decimal TotalAmount { get; set; }
         public List<OrderItemDTO> Items { get; set; } = [];
     }
 

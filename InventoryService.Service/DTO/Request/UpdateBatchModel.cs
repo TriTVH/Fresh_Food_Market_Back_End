@@ -14,7 +14,6 @@ namespace InventoryService.Service.DTO.Request
         public int Id { get; set; }
         public List<UpdateItem> Items { get; set; }
         public BatchAction Action { get; set; }
-        [MinLength(1, ErrorMessage = "At least one image is required")]
         public List<ImageItem> ImagesJson { get; set; } = new List<ImageItem>();
         public string CancelReason { get; set; }
     }
