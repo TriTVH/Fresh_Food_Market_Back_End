@@ -312,6 +312,34 @@ namespace OrderService.Service.Implementor
             );
         }
 
+        public async Task<ApiResponse<List<TransactionDTO>>> GetTransactionsAsync()
+        {
+            try
+            {
+                var transactions = await _transactionRepo.GetAllTransactionsAsync();
+
+                var result = transactions.Select(t => new TransactionDTO
+                {
+                    Id = t.Id,
+                    Type = t.Type,
+                    Direction = t.Direction,
+                    Amount = t.Amount,
+                    Status = t.Status,
+                    OrderId = t.OrderId
+                }).ToList();
+
+                return ApiResponse<List<TransactionDTO>>.Ok(
+                    result,
+                    "Get transactions successfully",
+                    200
+                );
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<TransactionDTO>>.Error(null, ex.Message, 500);
+            }
+        }
+
         public async Task<ApiResponse<OrderDTO>> UpdateOrderAsync(UpdateOrderModel request)
         {
             var order = await _orderRepo.GetByIdAsync(request.OrderId);

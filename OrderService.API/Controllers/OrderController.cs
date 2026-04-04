@@ -70,6 +70,14 @@ namespace OrderService.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        [HttpGet("transactions")]
+        [Authorize]
+        public async Task<IActionResult> GetTransactions()
+        {
+            var response = await _orderService.GetTransactionsAsync();
+            return StatusCode(response.StatusCode, response);
+        }
+
         private string? GetUsername()
         {
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value
