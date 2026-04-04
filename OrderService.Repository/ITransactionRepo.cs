@@ -7,7 +7,7 @@ namespace OrderService.Repository
         Task<Transaction> CreateAsync(Transaction transaction);
         Task<Transaction?> GetByIdAsync(int id);
         Task UpdateAsync(Transaction transaction);
-
         Task DeleteAsync(Transaction transaction);
+        Task<List<Transaction>> GetAllTransactionsAsync();
     }
 }

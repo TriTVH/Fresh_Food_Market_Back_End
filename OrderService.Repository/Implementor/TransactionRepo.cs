@@ -36,5 +36,12 @@ namespace OrderService.Repository.Implementor
             _context.Transactions.Update(transaction);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Transaction>> GetAllTransactionsAsync()
+        {
+            return await _context.Transactions
+                .Include(t => t.Order)
+                .ToListAsync();
+        }
     }
 }

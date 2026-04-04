@@ -12,6 +12,7 @@ namespace OrderService.Service
         Task<ApiResponse<List<OrderDTO>>> GetOrdersByUsernameAsync(string accUsername);
         Task<ApiResponse<OrderDTO>> GetOrderByIdAsync(int orderId);
         Task<ApiResponse<List<OrderDTO>>> GetOrders();
+        Task<ApiResponse<List<TransactionDTO>>> GetTransactionsAsync();
 
         Task<ApiResponse<bool>> CancelOrderAsync(CancelOrderRequest request);
         Task<ApiResponse<bool>> ProcessVnPay(string vnp_TxnRef, string vnp_ResponseCode);
